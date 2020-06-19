@@ -1,0 +1,75 @@
+type User {
+  id: ID! @id
+  nickname: String!
+  email: String! @unique
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  files: [File!]! @relation(name: "ThumbnailOfUser", onDelete: CASCADE)
+  posts: [Post!]! @relation(name: "PostOfUser", onDelete: CASCADE)
+  likes: [Like!]! @relation(name: "LikeOfUser", onDelete: CASCADE)
+  comments: [Comment!]! @relation(name: "CommentOfUser", onDelete: CASCADE)
+  accepts: [Accept!]! @relation(name: "AcceptOfUser", onDelete: CASCADE)
+  loginSecret: String 
+  followedBy: [User!]! @relation(name: "UserFollows", references: [id])
+  following: [User!]! @relation(name: "UserFollows", references: [id])
+  rooms: [MessageRoom!]! @relation(name: "MessageRoomOfUser")
+}
+
+type Post {
+  id: ID! @id
+  title: String! @length(max: 200)
+  description: String @length(max: 500)
+  files: [File!]! @relation(name: "ImageOfPost", onDelete: CASCADE)
+  user: User! @relation(name: "PostOfUser")
+  likes: [Like!]! @relation(name: "LikeOfPost", onDelete: CASCADE)
+  comments: [Comment!]! @relation(name: "CommentOfPost", onDelete: CASCADE)
+  accepts: [Accept!]! @relation(name: "AcceptOfPost", onDelete: CASCADE)
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+}
+
+type Like {
+  id: ID! @id
+  user: User! @relation(name: "LikeOfUser")
+  post: Post! @relation(name: "LikeOfPost")
+}
+
+type Accept {
+  id: ID! @id
+  user: User! @relation(name: "AcceptOfUser")
+  post: Post! @relation(name: "AcceptOfPost")
+}
+
+type Comment {
+  id: ID! @id 
+  user: User! @relation(name: "CommentOfUser")
+  post: Post! @relation(name: "CommentOfPost")
+  content: String! @length(max: 500)
+  comments: [Comment!]!
+}
+
+type File {
+  id: ID! @id
+  url: String!
+  user: User @relation(name: "ThumbnailOfUser")
+  post: Post @relation(name: "ImageOfPost")
+}
+
+type MessageRoom {
+  id: ID! @id 
+  participants: [User!]! @relation(name: "MessageRoomOfUser")
+  messages: [Message!]! @relation(name: "MessageOfRoom")
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+}
+
+type Message {
+  id: ID! @id 
+  content: String! 
+  from: User! @relation(name: "From")
+  to: User @relation(name: "To")
+  room: MessageRoom! @relation(name: "MessageOfRoom", onDelete: CASCADE)
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+}
+
