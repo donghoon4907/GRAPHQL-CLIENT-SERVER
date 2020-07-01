@@ -14,7 +14,13 @@ type Query {
 }
 
 type Mutation {
-  addUser(email: String!, nickname: String!, file: String): User!
+  addUser(
+    email: String!
+    nickname: String!
+    firstname: String!
+    lastname: String!
+    file: String
+  ): BooleanResult!
 
   updateUser(nickname: String!, file: String): User!
 

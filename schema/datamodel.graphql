@@ -1,6 +1,8 @@
 type User {
   id: ID!
   nickname: String!
+  firstname: String!
+  lastname: String!
   email: String!
   createdAt: String!
   updatedAt: String!
@@ -74,4 +76,9 @@ type Message {
   room: MessageRoom!
   createdAt: String!
   updatedAt: String!
+}
+
+type BooleanResult {
+  success: Boolean!
+  message: String!
 }

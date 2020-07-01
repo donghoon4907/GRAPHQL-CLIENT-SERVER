@@ -71,23 +71,43 @@ module.exports = {
   Mutation: {
     // 사용자 추가
     addUser: async (_, args) => {
-      const { email, nickname, file } = args;
+      const { email, nickname, firstname, lastname, file } = args;
 
-      const newUser = prisma.createUser({
-        email,
-        nickname
-      });
+      try {
+        const isExistEmail = await prisma.$exists.user({ email });
 
-      if (file) {
-        await prisma.createFile({
-          url: file,
-          user: {
-            connect: { id: newUser.id }
-          }
+        if (isExistEmail) {
+          return {
+            success: false,
+            message: "이미 등록된 이메일입니다."
+          };
+        }
+
+        const newUser = await prisma.createUser({
+          email,
+          nickname,
+          firstname,
+          lastname
         });
-      }
 
-      return newUser;
+        if (file) {
+          await prisma.createFile({
+            url: file,
+            user: {
+              connect: { id: newUser.id }
+            }
+          });
+        }
+        return {
+          success: true,
+          message: "회원가입이 정상처리 되었습니다."
+        };
+      } catch {
+        return {
+          success: false,
+          message: "회원가입 요청 중 오류가 발생했습니다."
+        };
+      }
     },
     // 사용자 정보 수정
     updateUser: async (_, args, { request, isAuthenticated }) => {
@@ -135,7 +155,7 @@ module.exports = {
     requestSecret: async (_, args) => {
       const { email } = args;
 
-      const loginSecret = Array.fill(4)
+      const loginSecret = Array.from({ length: 4 })
         .map((_) => {
           return Math.floor(Math.random() * 9);
         })
@@ -144,6 +164,7 @@ module.exports = {
       try {
         await sendMail({ email, loginSecret });
         await prisma.updateUser({ data: { loginSecret }, where: { email } });
+
         return true;
       } catch {
         return false;

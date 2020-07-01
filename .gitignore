@@ -1,5 +1,5 @@
 .env
 generated
 node_modules
-# prisma.yml: 실제로는 배포하면 안됨
+prisma.yml
 .vscode

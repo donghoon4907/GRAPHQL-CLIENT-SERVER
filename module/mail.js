@@ -31,7 +31,7 @@ module.exports = ({ email, loginSecret }) => {
   );
 
   return transporter.sendMail({
-    from: "master@platform.com",
+    from: `Master ${config.mailer.user}`,
     to: email,
     subject: `로그인 인증 코드 [${loginSecret}]`,
     html: ""
