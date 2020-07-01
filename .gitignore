@@ -1,5 +1,2 @@
-.env
 generated
 node_modules
-prisma.yml
-.vscode
