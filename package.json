@@ -32,8 +32,9 @@
     "remove": "prisma delete",
     "prisma": "yarn run deploy && yarn run generate",
     "rebuildprisma": "yarn run remove && yarn run deploy && yarn run generate",
-    "postbuild": "cd src && npx copy schema/**/*.graphql ../build/schema/",
-    "build": "babel src -d build"
+    "prebuild": "yarn run prisma",
+    "build": "babel src -d build",
+    "postbuild": "cd src && npx copy schema/**/*.graphql ../build/schema/"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.10.5",

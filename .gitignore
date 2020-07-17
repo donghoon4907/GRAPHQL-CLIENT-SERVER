@@ -2,5 +2,4 @@
 generated
 node_modules
 .env
-prisma.yml
 build
