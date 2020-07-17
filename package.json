@@ -34,11 +34,12 @@
     "deploy": "prisma deploy",
     "generate": "prisma generate",
     "remove": "prisma delete",
+    "copy": "npx copy src/schema/*.graphql build && npx copy src/schema/**/*.graphql build",
     "prisma": "yarn run deploy && yarn run generate",
     "rebuildprisma": "yarn run remove && yarn run deploy && yarn run generate",
     "prebuild": "rimraf build",
     "build": "babel src -d build",
-    "postbuild": "cd src && npx copy ./schema/**/*.graphql ../build/schema/",
+    "postbuild": "yarn run copy",
     "prestart": "",
     "start": "node build/index.js"
   },
