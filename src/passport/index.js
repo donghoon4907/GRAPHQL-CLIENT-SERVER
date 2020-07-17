@@ -2,12 +2,12 @@ const passport = require("passport");
 const { Strategy, ExtractJwt } = require("passport-jwt");
 const dotenv = require("dotenv");
 const path = require("path");
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
-const { prisma } = require("../generated/prisma-client");
+const { prisma } = require("../../generated/prisma-client");
 
 const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // 헤더에서 jwt를 찾음
   secretOrKey: process.env.JWT_SECRET
 };
 
@@ -32,7 +32,5 @@ exports.authenticateJwt = (req, res, next) =>
     next();
   })(req, res, next);
 
-exports.initializePassport = () => {
-  passport.use(new Strategy(jwtOptions, verifyUser));
-  passport.initialize();
-};
+passport.use(new Strategy(jwtOptions, verifyUser));
+passport.initialize();

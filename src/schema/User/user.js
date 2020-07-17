@@ -1,13 +1,16 @@
-const { prisma } = require("../../generated/prisma-client");
-const sendMail = require("../../module/mail");
+//const sendMail = require("../../module/mail");
 const generateToken = require("../../module/token");
-const { USER_FRAGMENT } = require("../../fragment/user");
+const {
+  USER_FRAGMENT,
+  MESSAGEROOM_FRAGMENT,
+  MESSAGE_FRAGMENT
+} = require("../../fragment/user");
 
 module.exports = {
   Query: {
     // 사용자 검색
-    getUsers: async (_, args) => {
-      const { skip, first, nickname, orderBy } = args;
+    getUsers: async (_, args, { prisma }) => {
+      const { skip = 0, first = 30, orderBy = "nickname_ASC", nickname } = args;
 
       const orFilter = [];
 
@@ -16,31 +19,23 @@ module.exports = {
       }
       const where = orFilter.length > 0 ? { OR: orFilter } : {};
 
-      const users = await prisma.users({
-        first,
-        skip,
-        where,
-        orderBy
-      });
-
-      const count = await prisma
-        .usersConnection({ where })
-        .aggregate()
-        .count();
-
-      return {
-        users,
-        count
-      };
+      return prisma
+        .users({
+          first,
+          skip,
+          where,
+          orderBy
+        })
+        .$fragment(USER_FRAGMENT);
     },
     // 사용자 정보
-    getUser: (_, args) => {
+    getUser: (_, args, { prisma }) => {
       const { userId } = args;
 
       return prisma.user({ id: userId }).$fragment(USER_FRAGMENT);
     },
     // 내정보
-    getMyProfile: (_, __, { request, isAuthenticated }) => {
+    getMyProfile: (_, __, { request, isAuthenticated, prisma }) => {
       isAuthenticated({ request });
       const {
         user: { id }
@@ -49,68 +44,94 @@ module.exports = {
       return prisma.user({ id }).$fragment(USER_FRAGMENT);
     },
     // 메시지방 검색
-    getMessageRooms: (_, args, { request, isAuthenticated }) => {
+    getMessageRooms: (_, args, { request, isAuthenticated, prisma }) => {
       isAuthenticated({ request });
       const { skip, first } = args;
       const {
         user: { id }
       } = request;
 
-      return prisma.messageRooms({
+      return prisma
+        .messageRooms({
+          where: {
+            participants_some: {
+              id
+            }
+          },
+          skip,
+          first,
+          orderBy: "updatedAt_DESC"
+        })
+        .$fragment(MESSAGEROOM_FRAGMENT);
+    },
+    // 메시지방 상세 조회
+    getMessageRoom: async (
+      _,
+      { roomId },
+      { request, isAuthenticated, prisma }
+    ) => {
+      isAuthenticated({ request });
+      const {
+        user: { id }
+      } = request;
+
+      const isExistRoom = await prisma.messageRooms({
         where: {
+          id: roomId,
           participants_some: {
             id
           }
-        },
-        skip,
-        first,
-        orderBy: "updatedAt_DESC"
+        }
       });
+
+      if (!isExistRoom) {
+        throw Error("접근 권한이 없습니다.");
+      }
+
+      return prisma
+        .messageRoom({
+          id: roomId
+        })
+        .$fragment(MESSAGEROOM_FRAGMENT);
     }
   },
   Mutation: {
     // 사용자 추가
-    addUser: async (_, args) => {
+    addUser: async (_, args, { prisma }) => {
       const { email, nickname, firstname, lastname, file } = args;
 
-      try {
-        const isExistEmail = await prisma.$exists.user({ email });
+      const isExistEmail = await prisma.$exists.user({ email });
 
-        if (isExistEmail) {
-          return {
-            success: false,
-            message: "이미 등록된 이메일입니다."
-          };
-        }
-
-        const newUser = await prisma.createUser({
-          email,
-          nickname,
-          firstname,
-          lastname
-        });
-
-        if (file) {
-          await prisma.createFile({
-            url: file,
-            user: {
-              connect: { id: newUser.id }
-            }
-          });
-        }
-        return {
-          success: true,
-          message: "회원가입이 정상처리 되었습니다."
-        };
-      } catch {
-        return {
-          success: false,
-          message: "회원가입 요청 중 오류가 발생했습니다."
-        };
+      if (isExistEmail) {
+        throw Error("이미 등록된 이메일입니다.");
       }
+
+      const isExistNickname = await prisma.$exists.user({ nickname });
+
+      if (isExistNickname) {
+        throw Error("이미 존재하는 별명입니다.");
+      }
+
+      const newUser = await prisma.createUser({
+        email,
+        nickname,
+        firstname,
+        lastname
+      });
+
+      if (file) {
+        await prisma.createImage({
+          url: file,
+          user: {
+            connect: { id: newUser.id }
+          }
+        });
+      }
+
+      return true;
     },
     // 사용자 정보 수정
-    updateUser: async (_, args, { request, isAuthenticated }) => {
+    updateUser: async (_, args, { request, isAuthenticated, prisma }) => {
       isAuthenticated({ request });
       const { nickname, file } = args;
       const {
@@ -148,11 +169,11 @@ module.exports = {
         }
         return updatedUser;
       } else {
-        throw Error("잘못된 접근입니다.");
+        throw Error("존재하지 않는 사용자입니다.");
       }
     },
     // 인증 요청
-    requestSecret: async (_, args) => {
+    requestSecret: async (_, args, { prisma }) => {
       const { email } = args;
 
       const loginSecret = Array.from({ length: 4 })
@@ -161,17 +182,22 @@ module.exports = {
         })
         .join("");
 
-      try {
-        await sendMail({ email, loginSecret });
-        await prisma.updateUser({ data: { loginSecret }, where: { email } });
-
-        return true;
-      } catch {
-        return false;
+      //try {
+      //  await sendMail({ email, loginSecret });
+      //} catch (e) {
+      //  console.log(e);
+      //  throw new Error("이메일 전송에 실패했습니다.");
+      //}
+      const isExistEmail = await prisma.$exists.user({ email });
+      if (!isExistEmail) {
+        throw Error("가입되지 않은 이메일입니다.");
       }
+      await prisma.updateUser({ data: { loginSecret }, where: { email } });
+
+      return loginSecret;
     },
     // 인증 확인
-    confirmSecret: async (_, args) => {
+    confirmSecret: async (_, args, { prisma }) => {
       const { email, secret } = args;
 
       const user = await prisma.user({ email });
@@ -182,13 +208,13 @@ module.exports = {
             loginSecret: ""
           }
         });
-        return generateToken(user.id);
+        return generateToken({ id: user.id });
       } else {
         throw Error("메일에 전송된 보안문자와 일치하지 않습니다.");
       }
     },
     // 팔로우
-    follow: async (_, args, { request, isAuthenticated }) => {
+    follow: async (_, args, { request, isAuthenticated, prisma }) => {
       isAuthenticated({ request });
       const { userId } = args;
       const {
@@ -209,7 +235,7 @@ module.exports = {
       }
     },
     // 언팔로우
-    unfollow: async (_, args, { request, isAuthenticated }) => {
+    unfollow: async (_, args, { request, isAuthenticated, prisma }) => {
       isAuthenticated({ request });
       const { userId } = args;
       const {
@@ -230,12 +256,12 @@ module.exports = {
       }
     },
     // 메세지 전송
-    addMessage: async (_, args, { request, isAuthenticated }) => {
+    addMessage: async (_, args, { request, isAuthenticated, prisma }) => {
       isAuthenticated({ request });
       const {
         user: { id }
       } = request;
-      const { content, messageRoomId, to } = args;
+      const { content, roomId, to } = args;
       // 메세지 생성 데이터
       const param = {
         content,
@@ -246,15 +272,15 @@ module.exports = {
         }
       };
       // 방 메세지 전송 시
-      let messageRoom;
-      if (messageRoomId) {
+      let room;
+      if (roomId) {
         param["room"] = {
           connect: {
-            id: messageRoomId
+            id: roomId
           }
         };
-        messageRoom = await prisma.messageRoom({
-          id: messageRoomId
+        room = await prisma.messageRoom({
+          id: roomId
         });
         // 개인 메세지 전송 시
       } else {
@@ -265,7 +291,7 @@ module.exports = {
               id: to
             }
           };
-          messageRoom = await prisma.createMessageRoom({
+          room = await prisma.createMessageRoom({
             participants: {
               connect: {
                 id: [id, to]
@@ -274,18 +300,40 @@ module.exports = {
           });
         }
       }
-      if (!messageRoom) {
+      if (!room) {
         throw Error("잘못된 접근입니다.");
       }
 
-      return prisma.createMessage(param);
+      await prisma.createMessage(param);
+
+      return true;
+    },
+    // 알림 읽기
+    readAlert: async (_, args, { request, isAuthenticated, prisma }) => {
+      isAuthenticated({ request });
+      const {
+        user: { id }
+      } = request;
+      const { alertId } = args;
+
+      const isExistAlert = await prisma.$exists.alert({
+        id: alertId,
+        user: { id }
+      });
+
+      if (isExistAlert) {
+        await prisma.deleteAlert({ where: { id: alertId } });
+        return true;
+      } else {
+        return false;
+      }
     }
   },
   Subscription: {
     // 메세지 갱신
     syncMessage: {
-      subscribe: (_, args) => {
-        const { messageRoomId } = args;
+      subscribe: (_, args, { prisma }) => {
+        const { roomId } = args;
 
         return prisma.$subscribe
           .message({
@@ -296,9 +344,7 @@ module.exports = {
               {
                 node: {
                   room: {
-                    id: {
-                      messageRoomId
-                    }
+                    id: roomId
                   }
                 }
               }
@@ -306,13 +352,18 @@ module.exports = {
           })
           .node();
       },
-      resolve: (payload) => payload
+      resolve: ({ id }, _, { prisma }) =>
+        prisma
+          .message({
+            id
+          })
+          .$fragment(MESSAGE_FRAGMENT)
     }
   },
   // computed
   User: {
     // 내가 팔로우 중인 사용자인지 여부
-    isFollowing: (parent, _, { request }) => {
+    isFollowing: (parent, _, { request, prisma }) => {
       const {
         user: { id }
       } = request;
@@ -337,7 +388,7 @@ module.exports = {
   },
   MessageRoom: {
     // 최근 내 메세지
-    recentMyMessage: async (parent, _, { request }) => {
+    recentMyMessage: async (parent, _, { request, prisma }) => {
       const {
         user: { id }
       } = request;

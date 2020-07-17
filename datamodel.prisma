@@ -1,12 +1,12 @@
 type User {
   id: ID! @id
-  nickname: String!
+  nickname: String! @unique
   firstname: String!
   lastname: String!
   email: String! @unique
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
-  files: [File!]! @relation(name: "ThumbnailOfUser", onDelete: CASCADE)
+  avatar: Image @relation(name: "AvartarOfUser", link: INLINE)
   posts: [Post!]! @relation(name: "PostOfUser", onDelete: CASCADE)
   likes: [Like!]! @relation(name: "LikeOfUser", onDelete: CASCADE)
   comments: [Comment!]! @relation(name: "CommentOfUser", onDelete: CASCADE)
@@ -15,19 +15,22 @@ type User {
   followedBy: [User!]! @relation(name: "UserFollows", references: [id])
   following: [User!]! @relation(name: "UserFollows", references: [id])
   rooms: [MessageRoom!]! @relation(name: "MessageRoomOfUser")
+  alerts: [Alert!]! @relation(name: "AlertOfUser", onDelete: CASCADE)
 }
 
 type Post {
   id: ID! @id
   title: String! @length(max: 200)
   description: String @length(max: 500)
-  files: [File!]! @relation(name: "ImageOfPost", onDelete: CASCADE)
+  video: Video!
   user: User! @relation(name: "PostOfUser")
   likes: [Like!]! @relation(name: "LikeOfPost", onDelete: CASCADE)
   comments: [Comment!]! @relation(name: "CommentOfPost", onDelete: CASCADE)
   accepts: [Accept!]! @relation(name: "AcceptOfPost", onDelete: CASCADE)
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
+  status: PostStatus!
+  room: MessageRoom @relation(name: "PostOfMessageRoom", link: INLINE)
 }
 
 type Like {
@@ -40,6 +43,7 @@ type Accept {
   id: ID! @id
   user: User! @relation(name: "AcceptOfUser")
   post: Post! @relation(name: "AcceptOfPost")
+  status: AcceptStatus!
 }
 
 type Comment {
@@ -50,11 +54,21 @@ type Comment {
   comments: [Comment!]!
 }
 
-type File {
+type Image {
   id: ID! @id
   url: String!
-  user: User @relation(name: "ThumbnailOfUser")
-  post: Post @relation(name: "ImageOfPost")
+  user: User @relation(name: "AvartarOfUser")
+}
+
+type Video {
+  id: ID! @id
+  url: String!
+  url_240p: String
+  url_320p: String
+  url_480p: String
+  url_720p: String
+  url_1080p: String
+  status: String
 }
 
 type MessageRoom {
@@ -63,6 +77,7 @@ type MessageRoom {
   messages: [Message!]! @relation(name: "MessageOfRoom")
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
+  post: Post @relation(name: "PostOfMessageRoom")
 }
 
 type Message {
@@ -73,5 +88,22 @@ type Message {
   room: MessageRoom! @relation(name: "MessageOfRoom", onDelete: CASCADE)
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
+}
+
+type Alert {
+  id: ID! @id
+  user: User! @relation(name: "AlertOfUser")
+  content: String! 
+}
+
+enum AcceptStatus {
+  REQUEST
+  RESOLVE
+  REJECT
+}
+
+enum PostStatus {
+  PUBLIC
+  PRIVATE
 }
 

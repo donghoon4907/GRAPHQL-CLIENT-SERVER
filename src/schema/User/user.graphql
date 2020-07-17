@@ -1,0 +1,39 @@
+type Query {
+  getUsers(skip: Int, first: Int, orderBy: String, nickname: String): [User!]!
+
+  getUser(userId: String!): User!
+
+  getMyProfile: User!
+
+  getMessageRooms(skip: Int, first: Int): [MessageRoom!]!
+
+  getMessageRoom(roomId: String!): MessageRoom!
+}
+
+type Mutation {
+  addUser(
+    email: String!
+    nickname: String!
+    firstname: String!
+    lastname: String!
+    file: String
+  ): Boolean!
+
+  updateUser(nickname: String!, file: String): User!
+
+  requestSecret(email: String!): String!
+
+  confirmSecret(email: String!, secret: String!): String!
+
+  follow(userId: String!): Boolean!
+
+  unfollow(userId: String!): Boolean!
+
+  addMessage(content: String!, roomId: String, to: String): Boolean!
+
+  readAlert(alertId: String!): Boolean!
+}
+
+type Subscription {
+  syncMessage(roomId: String!): Message
+}

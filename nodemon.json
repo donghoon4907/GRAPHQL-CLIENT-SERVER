@@ -1,5 +1,5 @@
 {
-  "watch": ["index.js", "schema/**/*", "module/*"],
-  "exec": "node index.js",
+  "watch": ["src/*.*"],
+  "exec": "node src/index.js",
   "ext": "js graphql"
 }
