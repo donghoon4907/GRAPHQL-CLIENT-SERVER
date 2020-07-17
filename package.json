@@ -37,6 +37,7 @@
     "prebuild": "yarn run prisma",
     "build": "babel src -d build",
     "postbuild": "cd src && npx copy schema/**/*.graphql ../build/schema/",
+    "prestart": "yarn run build",
     "start": "node build/index.js"
   },
   "devDependencies": {
