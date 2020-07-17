@@ -34,10 +34,10 @@
     "remove": "prisma delete",
     "prisma": "yarn run deploy && yarn run generate",
     "rebuildprisma": "yarn run remove && yarn run deploy && yarn run generate",
-    "prebuild": "yarn run generate",
+    "prebuild": "yarn run prisma",
     "build": "babel src -d build",
     "postbuild": "cd src && npx copy schema/**/*.graphql ../build/schema/",
-    "prestart": "yarn run build",
+    "prestart": "",
     "start": "node build/index.js"
   },
   "devDependencies": {
