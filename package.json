@@ -9,6 +9,7 @@
   "dependencies": {
     "@babel/cli": "^7.10.5",
     "@babel/runtime": "^7.10.5",
+    "@ffmpeg-installer/ffmpeg": "^1.0.20",
     "aws-sdk": "^2.709.0",
     "copy": "^0.3.2",
     "cors": "^2.8.5",

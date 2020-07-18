@@ -4,7 +4,11 @@ var fs = require("fs");
 
 var path = require("path");
 
+var ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
+
 var ffmpeg = require("fluent-ffmpeg");
+
+ffmpeg.setFfmpegPath(ffmpegPath);
 
 var _require = require("uuid"),
     v4 = _require.v4; // transcoding video
@@ -39,7 +43,7 @@ exports.generateTranscodeVideo = function (_ref) {
   }
 
   return new Promise(function (resolve, reject) {
-    var output = path.join(__dirname, "../public/videos/".concat(uuid, ".mp4"));
+    var output = path.join(__dirname, "../temps/".concat(uuid, ".mp4"));
     ffmpeg().input(url).output(output).videoCodec("libx264").noAudio().format("mp4").size(size).on("end", function (_) {
       var fileStream = fs.readFileSync(output);
       resolve({

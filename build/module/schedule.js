@@ -104,7 +104,7 @@ exports.executeTranscode = function () {
 
                                   case 12:
                                     // 파일 삭제
-                                    fs.unlinkSync(path.join(__dirname, "../public/videos/".concat(transcoded.filename)));
+                                    fs.unlinkSync(path.join(__dirname, "../temps/".concat(transcoded.filename)));
 
                                   case 13:
                                   case "end":

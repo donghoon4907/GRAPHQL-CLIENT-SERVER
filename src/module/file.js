@@ -1,6 +1,8 @@
 const fs = require("fs");
 const path = require("path");
+const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffmpeg = require("fluent-ffmpeg");
+ffmpeg.setFfmpegPath(ffmpegPath);
 const { v4 } = require("uuid");
 
 // transcoding video
@@ -27,7 +29,7 @@ exports.generateTranscodeVideo = ({ url, resolution }) => {
   }
 
   return new Promise((resolve, reject) => {
-    const output = path.join(__dirname, `../public/videos/${uuid}.mp4`);
+    const output = path.join(__dirname, `../temps/${uuid}.mp4`);
 
     ffmpeg()
       .input(url)

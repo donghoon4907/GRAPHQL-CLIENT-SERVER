@@ -43,7 +43,7 @@ exports.executeTranscode = () => {
               });
               // 파일 삭제
               fs.unlinkSync(
-                path.join(__dirname, `../public/videos/${transcoded.filename}`)
+                path.join(__dirname, `../temps/${transcoded.filename}`)
               );
             }
           }
