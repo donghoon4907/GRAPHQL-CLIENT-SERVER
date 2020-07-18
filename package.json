@@ -45,7 +45,7 @@
     "dev-prisma": "yarn run dev-deploy  && yarn run dev-generate",
     "prd-prisma": "yarn run prd-deploy && yarn run prd-generate",
     "local-build": "rimraf build && cross-env NODE_ENV=production babel src -d build && cd src && npx copy ./schema/**/*.graphql ../build/schema/",
-    "build": "prisma deploy && prisma generate",
+    "build": "prisma generate",
     "start": "cross-env NODE_ENV=production node build/index.js"
   },
   "devDependencies": {
