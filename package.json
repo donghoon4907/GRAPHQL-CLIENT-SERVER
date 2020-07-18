@@ -9,6 +9,7 @@
     "aws-sdk": "^2.709.0",
     "copy": "^0.3.2",
     "cors": "^2.8.5",
+    "cross-env": "^7.0.2",
     "dotenv": "^8.0.0",
     "fluent-ffmpeg": "^2.1.2",
     "graphql-tools": "^6.0.1",
@@ -31,13 +32,13 @@
     "uuid": "^8.2.0"
   },
   "scripts": {
-    "dev": "nodemon --exec",
+    "dev": "cross-env NODE_ENV=development nodemon --exec",
     "deploy": "prisma deploy",
     "generate": "prisma generate",
     "remove": "prisma delete",
     "prisma": "yarn run deploy && yarn run generate",
-    "rebuildprisma": "yarn run remove && yarn run deploy && yarn run generate",
-    "localbuild": "rimraf build && babel src -d build && cd src && npx copy ./schema/**/*.graphql ../build/schema/",
+    "reset-prisma": "yarn run remove && yarn run deploy && yarn run generate",
+    "local-build": "rimraf build && cross-env NODE_ENV=production babel src -d build && cd src && npx copy ./schema/**/*.graphql ../build/schema/",
     "build": "yarn run prisma",
     "start": "node build/index.js"
   },

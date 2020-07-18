@@ -1,8 +1,8 @@
 "use strict";
 
-var morgan = require("morgan");
+require("./module/env");
 
-var dotenv = require("dotenv");
+var morgan = require("morgan");
 
 var _require = require("graphql-yoga"),
     GraphQLServer = _require.GraphQLServer;
@@ -25,10 +25,8 @@ var _require5 = require("./module/schedule"),
 
 var _require6 = require("./module/multer"),
     uploadMiddleware = _require6.uploadMiddleware,
-    uploadController = _require6.uploadController; // init
+    uploadController = _require6.uploadController; // request: express의 request 객체
 
-
-dotenv.config(); // request: express의 request 객체
 
 var server = new GraphQLServer({
   schema: schema,

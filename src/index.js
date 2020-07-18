@@ -1,5 +1,5 @@
+require("./module/env");
 const morgan = require("morgan");
-const dotenv = require("dotenv");
 const { GraphQLServer } = require("graphql-yoga");
 const { prisma } = require("../generated/prisma-client");
 const cors = require("cors");
@@ -8,9 +8,6 @@ const { authenticateJwt } = require("./passport");
 const { isAuthenticated } = require("./module/middleware");
 const { executeTranscode } = require("./module/schedule");
 const { uploadMiddleware, uploadController } = require("./module/multer");
-
-// init
-dotenv.config();
 
 // request: express의 request 객체
 const server = new GraphQLServer({

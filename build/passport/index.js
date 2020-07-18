@@ -12,14 +12,6 @@ var _require = require("passport-jwt"),
     Strategy = _require.Strategy,
     ExtractJwt = _require.ExtractJwt;
 
-var dotenv = require("dotenv");
-
-var path = require("path");
-
-dotenv.config({
-  path: path.resolve(__dirname, "../../.env")
-});
-
 var _require2 = require("../../generated/prisma-client"),
     prisma = _require2.prisma;
 

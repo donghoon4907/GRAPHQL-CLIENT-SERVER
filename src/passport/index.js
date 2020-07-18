@@ -1,8 +1,5 @@
 const passport = require("passport");
 const { Strategy, ExtractJwt } = require("passport-jwt");
-const dotenv = require("dotenv");
-const path = require("path");
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 const { prisma } = require("../../generated/prisma-client");
 
