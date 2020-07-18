@@ -33,14 +33,17 @@
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon --exec",
-    "deploy": "prisma deploy",
-    "generate": "prisma generate",
-    "remove": "prisma delete",
-    "prisma": "yarn run deploy && yarn run generate",
-    "reset-prisma": "yarn run remove && yarn run deploy && yarn run generate",
+    "dev-deploy": "prisma deploy --env-file .env.development",
+    "prd-deploy": "prisma deploy --env-file .env.production",
+    "dev-generate": "prisma generate --env-file .env.development",
+    "prd-generate": "prisma generate --env-file .env.production",
+    "dev-remove": "prisma delete --env-file .env.development",
+    "prd-remove": "prisma delete --env-file .env.production",
+    "dev-prisma": "yarn run dev-deploy  && yarn run dev-generate",
+    "prd-prisma": "yarn run prd-deploy && yarn run prd-generate",
     "local-build": "rimraf build && cross-env NODE_ENV=production babel src -d build && cd src && npx copy ./schema/**/*.graphql ../build/schema/",
-    "build": "yarn run prisma",
-    "start": "node build/index.js"
+    "build": "yarn run prd-prisma",
+    "start": "cross-env NODE_ENV=production node build/index.js"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.10.5",

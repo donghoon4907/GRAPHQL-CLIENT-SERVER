@@ -12,8 +12,6 @@ var _require = require("passport-jwt"),
     Strategy = _require.Strategy,
     ExtractJwt = _require.ExtractJwt;
 
-require("../module/env");
-
 var _require2 = require("../../generated/prisma-client"),
     prisma = _require2.prisma;
 
