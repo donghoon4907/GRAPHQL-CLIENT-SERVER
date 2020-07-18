@@ -2,6 +2,8 @@
 
 var jwt = require("jsonwebtoken");
 
+require("./module/env");
+
 module.exports = function (_ref) {
   var id = _ref.id;
   return jwt.sign({
