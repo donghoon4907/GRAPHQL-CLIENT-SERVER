@@ -6,7 +6,7 @@ const cors = require("cors");
 const schema = require("./schema");
 const { authenticateJwt } = require("./passport");
 const { isAuthenticated } = require("./module/middleware");
-const { executeTranscode } = require("./module/schedule");
+//const { executeTranscode } = require("./module/schedule");
 const { uploadMiddleware, uploadController } = require("./module/multer");
 
 // request: express의 request 객체
@@ -30,7 +30,7 @@ app.use(authenticateJwt);
 app.post("/api/upload", uploadMiddleware, uploadController);
 
 server.start({ port: process.env.PORT || 4000 }, () => {
-  executeTranscode();
+  //executeTranscode();
   console.log(
     `Server is running on http://localhost:${process.env.PORT || 4000}`
   );

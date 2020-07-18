@@ -18,14 +18,12 @@ var _require3 = require("./passport"),
     authenticateJwt = _require3.authenticateJwt;
 
 var _require4 = require("./module/middleware"),
-    isAuthenticated = _require4.isAuthenticated;
+    isAuthenticated = _require4.isAuthenticated; //const { executeTranscode } = require("./module/schedule");
 
-var _require5 = require("./module/schedule"),
-    executeTranscode = _require5.executeTranscode;
 
-var _require6 = require("./module/multer"),
-    uploadMiddleware = _require6.uploadMiddleware,
-    uploadController = _require6.uploadController; // request: express의 request 객체
+var _require5 = require("./module/multer"),
+    uploadMiddleware = _require5.uploadMiddleware,
+    uploadController = _require5.uploadController; // request: express의 request 객체
 
 
 var server = new GraphQLServer({
@@ -53,6 +51,6 @@ app.post("/api/upload", uploadMiddleware, uploadController);
 server.start({
   port: process.env.PORT || 4000
 }, function () {
-  executeTranscode();
+  //executeTranscode();
   console.log("Server is running on http://localhost:".concat(process.env.PORT || 4000));
 });

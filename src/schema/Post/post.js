@@ -20,10 +20,10 @@ module.exports = {
       const where =
         orFilter.length > 0
           ? {
-              OR: orFilter,
-              video: {
-                status: "complete"
-              }
+              OR: orFilter
+              // video: {
+              //   status: "complete"
+              // }
             }
           : {};
 
