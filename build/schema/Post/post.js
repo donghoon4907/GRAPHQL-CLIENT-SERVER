@@ -97,9 +97,6 @@ module.exports = {
                       id_in: following.map(function (user) {
                         return user.id;
                       })
-                    },
-                    video: {
-                      status: "complete"
                     }
                   },
                   first: first,

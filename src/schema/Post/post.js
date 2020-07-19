@@ -56,9 +56,6 @@ module.exports = {
           where: {
             user: {
               id_in: following.map((user) => user.id)
-            },
-            video: {
-              status: "complete"
             }
           },
           first,
