@@ -5,17 +5,20 @@ type User {
   nickname: String!
   firstname: String!
   lastname: String!
+  pwd: String!
   email: String!
   createdAt: String!
   updatedAt: String!
   avatar: Image
   posts: [Post!]!
+  likes: [Like!]!
   loginSecret: String
   followedBy: [User!]!
   following: [User!]!
   rooms: [MessageRoom!]!
   isFollowing: Boolean!
   isMe: Boolean!
+  isMaster: Boolean!
 }
 
 type Post {
@@ -101,6 +104,14 @@ type Alert {
   id: ID!
   user: User!
   content: String!
+}
+
+type Notice {
+  id: ID!
+  title: String!
+  description: String!
+  createdAt: String!
+  updatedAt: String!
 }
 
 type File {

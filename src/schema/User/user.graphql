@@ -1,6 +1,8 @@
 type Query {
   getUsers(skip: Int, first: Int, orderBy: String, nickname: String): [User!]!
 
+  getRecommandUsers: [User!]!
+
   getUser(userId: String!): User!
 
   getMyProfile: User!
@@ -13,6 +15,7 @@ type Query {
 type Mutation {
   addUser(
     email: String!
+    pwd: String!
     nickname: String!
     firstname: String!
     lastname: String!
@@ -24,6 +27,8 @@ type Mutation {
   requestSecret(email: String!): String!
 
   confirmSecret(email: String!, secret: String!): String!
+
+  logIn(email: String!, pwd: String!): String!
 
   follow(userId: String!): Boolean!
 

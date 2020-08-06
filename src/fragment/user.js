@@ -3,6 +3,7 @@ exports.USER_FRAGMENT = `
     id
     nickname 
     email
+    isMaster
     avatar {
       url
     }

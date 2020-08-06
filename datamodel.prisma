@@ -4,6 +4,8 @@ type User {
   firstname: String!
   lastname: String!
   email: String! @unique
+  pwd: String! 
+  isMaster: Boolean! @default(value: false)
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
   avatar: Image @relation(name: "AvartarOfUser", link: INLINE)
@@ -94,6 +96,14 @@ type Alert {
   id: ID! @id
   user: User! @relation(name: "AlertOfUser")
   content: String! 
+}
+
+type Notice {
+  id: ID! @id 
+  title: String!
+  description: String!
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
 enum AcceptStatus {

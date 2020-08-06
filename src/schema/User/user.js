@@ -1,4 +1,5 @@
 //const sendMail = require("../../module/mail");
+const bcrypt = require("bcrypt");
 const generateToken = require("../../module/token");
 const {
   USER_FRAGMENT,
@@ -27,6 +28,19 @@ module.exports = {
           orderBy
         })
         .$fragment(USER_FRAGMENT);
+    },
+    // 팔로우 추천 사용자 목록
+    getRecommandUsers: (_, __, { request, prisma, isAuthenticated }) => {
+      isAuthenticated({ request });
+      const {
+        user: { id }
+      } = request;
+
+      return prisma.users({
+        where: {
+          id_not: id
+        }
+      });
     },
     // 사용자 정보
     getUser: (_, args, { prisma }) => {
@@ -98,7 +112,7 @@ module.exports = {
   Mutation: {
     // 사용자 추가
     addUser: async (_, args, { prisma }) => {
-      const { email, nickname, firstname, lastname, file } = args;
+      const { email, pwd, nickname, firstname, lastname, file } = args;
 
       const isExistEmail = await prisma.$exists.user({ email });
 
@@ -112,8 +126,11 @@ module.exports = {
         throw Error("이미 존재하는 별명입니다.");
       }
 
+      const hashedPassword = await bcrypt.hash(pwd, 12);
+
       const newUser = await prisma.createUser({
         email,
+        pwd: hashedPassword,
         nickname,
         firstname,
         lastname
@@ -177,7 +194,7 @@ module.exports = {
       const { email } = args;
 
       const loginSecret = Array.from({ length: 4 })
-        .map((_) => {
+        .map(_ => {
           return Math.floor(Math.random() * 9);
         })
         .join("");
@@ -211,6 +228,23 @@ module.exports = {
         return generateToken({ id: user.id });
       } else {
         throw Error("메일에 전송된 보안문자와 일치하지 않습니다.");
+      }
+    },
+    logIn: async (_, args, { prisma }) => {
+      const { email, pwd } = args;
+
+      const user = await prisma.user({ email });
+
+      if (user) {
+        const isCheckPwd = await bcrypt.compare(pwd, user.pwd);
+
+        if (isCheckPwd) {
+          return generateToken({ id: user.id });
+        } else {
+          throw Error("비밀번호를 확인하세요.");
+        }
+      } else {
+        throw Error("존재하지 않는 이메일입니다.");
       }
     },
     // 팔로우
