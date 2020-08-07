@@ -1,4 +1,3 @@
-//const sendMail = require("../../module/mail");
 const bcrypt = require("bcrypt");
 const generateToken = require("../../module/token");
 const {
@@ -28,19 +27,6 @@ module.exports = {
           orderBy
         })
         .$fragment(USER_FRAGMENT);
-    },
-    // 팔로우 추천 사용자 목록
-    getRecommandUsers: (_, __, { request, prisma, isAuthenticated }) => {
-      isAuthenticated({ request });
-      const {
-        user: { id }
-      } = request;
-
-      return prisma.users({
-        where: {
-          id_not: id
-        }
-      });
     },
     // 사용자 정보
     getUser: (_, args, { prisma }) => {
@@ -112,7 +98,7 @@ module.exports = {
   Mutation: {
     // 사용자 추가
     addUser: async (_, args, { prisma }) => {
-      const { email, pwd, nickname, firstname, lastname, file } = args;
+      const { email, pwd, nickname, file } = args;
 
       const isExistEmail = await prisma.$exists.user({ email });
 
@@ -128,22 +114,16 @@ module.exports = {
 
       const hashedPassword = await bcrypt.hash(pwd, 12);
 
-      const newUser = await prisma.createUser({
+      await prisma.createUser({
         email,
         pwd: hashedPassword,
         nickname,
-        firstname,
-        lastname
-      });
-
-      if (file) {
-        await prisma.createImage({
-          url: file,
-          user: {
-            connect: { id: newUser.id }
+        avatar: {
+          create: {
+            url: file
           }
-        });
-      }
+        }
+      });
 
       return true;
     },
@@ -189,47 +169,7 @@ module.exports = {
         throw Error("존재하지 않는 사용자입니다.");
       }
     },
-    // 인증 요청
-    requestSecret: async (_, args, { prisma }) => {
-      const { email } = args;
-
-      const loginSecret = Array.from({ length: 4 })
-        .map(_ => {
-          return Math.floor(Math.random() * 9);
-        })
-        .join("");
-
-      //try {
-      //  await sendMail({ email, loginSecret });
-      //} catch (e) {
-      //  console.log(e);
-      //  throw new Error("이메일 전송에 실패했습니다.");
-      //}
-      const isExistEmail = await prisma.$exists.user({ email });
-      if (!isExistEmail) {
-        throw Error("가입되지 않은 이메일입니다.");
-      }
-      await prisma.updateUser({ data: { loginSecret }, where: { email } });
-
-      return loginSecret;
-    },
-    // 인증 확인
-    confirmSecret: async (_, args, { prisma }) => {
-      const { email, secret } = args;
-
-      const user = await prisma.user({ email });
-      if (user.loginSecret === secret) {
-        await prisma.updateUser({
-          where: { id: user.id },
-          data: {
-            loginSecret: ""
-          }
-        });
-        return generateToken({ id: user.id });
-      } else {
-        throw Error("메일에 전송된 보안문자와 일치하지 않습니다.");
-      }
-    },
+    // 로그인 요청
     logIn: async (_, args, { prisma }) => {
       const { email, pwd } = args;
 

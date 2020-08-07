@@ -29,16 +29,3 @@ exports.POST_FRAGMENT = `
     }
   }
 `;
-
-exports.ACCEPT_FRAGMENT = `
-  fragment AcceptParts on Accept {
-    id
-    user {
-      id
-      nickname
-      avatar {
-        url
-      }
-    }
-  }
-`;

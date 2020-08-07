@@ -39,7 +39,9 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon --exec",
     "dev-deploy": "prisma deploy --env-file .env.development",
+    "dev-force-deploy": "prisma deploy --force --env-file .env.development",
     "prd-deploy": "prisma deploy --env-file .env.production",
+    "prd-force-deploy": "prisma deploy --force --env-file .env.production",
     "dev-generate": "prisma generate --env-file .env.development",
     "prd-generate": "prisma generate --env-file .env.production",
     "dev-remove": "prisma delete --env-file .env.development",

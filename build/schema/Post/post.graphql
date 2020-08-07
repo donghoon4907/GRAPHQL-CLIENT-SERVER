@@ -28,25 +28,5 @@ type Mutation {
 
   deletePost(postId: String!): Boolean!
 
-  addComment(content: String!, postId: String!): Boolean!
-
-  updateComment(
-    content: String!
-    postId: String!
-    userId: String
-    commentId: String!
-  ): Comment!
-
-  deleteComment(commentId: String!): Comment!
-
   likePost(postId: String!): Boolean!
-
-  acceptPost(postId: String!): Boolean!
-
-  confirmAccept(
-    acceptId: String!
-    postId: String!
-    userId: String!
-    status: String!
-  ): Boolean!
 }

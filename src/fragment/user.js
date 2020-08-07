@@ -24,9 +24,6 @@ exports.USER_FRAGMENT = `
       likes {
         id
       }
-      comments {
-        id
-      }
     }
     rooms {
       id

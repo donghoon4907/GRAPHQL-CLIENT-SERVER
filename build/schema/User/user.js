@@ -6,7 +6,6 @@ var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"))
 
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 
-//const sendMail = require("../../module/mail");
 var bcrypt = require("bcrypt");
 
 var generateToken = require("../../module/token");
@@ -61,34 +60,19 @@ module.exports = {
 
       return getUsers;
     }(),
-    // 팔로우 추천 사용자 목록
-    getRecommandUsers: function getRecommandUsers(_, __, _ref2) {
-      var request = _ref2.request,
-          prisma = _ref2.prisma,
-          isAuthenticated = _ref2.isAuthenticated;
-      isAuthenticated({
-        request: request
-      });
-      var id = request.user.id;
-      return prisma.users({
-        where: {
-          id_not: id
-        }
-      });
-    },
     // 사용자 정보
-    getUser: function getUser(_, args, _ref3) {
-      var prisma = _ref3.prisma;
+    getUser: function getUser(_, args, _ref2) {
+      var prisma = _ref2.prisma;
       var userId = args.userId;
       return prisma.user({
         id: userId
       }).$fragment(USER_FRAGMENT);
     },
     // 내정보
-    getMyProfile: function getMyProfile(_, __, _ref4) {
-      var request = _ref4.request,
-          isAuthenticated = _ref4.isAuthenticated,
-          prisma = _ref4.prisma;
+    getMyProfile: function getMyProfile(_, __, _ref3) {
+      var request = _ref3.request,
+          isAuthenticated = _ref3.isAuthenticated,
+          prisma = _ref3.prisma;
       isAuthenticated({
         request: request
       });
@@ -98,10 +82,10 @@ module.exports = {
       }).$fragment(USER_FRAGMENT);
     },
     // 메시지방 검색
-    getMessageRooms: function getMessageRooms(_, args, _ref5) {
-      var request = _ref5.request,
-          isAuthenticated = _ref5.isAuthenticated,
-          prisma = _ref5.prisma;
+    getMessageRooms: function getMessageRooms(_, args, _ref4) {
+      var request = _ref4.request,
+          isAuthenticated = _ref4.isAuthenticated,
+          prisma = _ref4.prisma;
       isAuthenticated({
         request: request
       });
@@ -121,14 +105,14 @@ module.exports = {
     },
     // 메시지방 상세 조회
     getMessageRoom: function () {
-      var _getMessageRoom = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(_, _ref6, _ref7) {
+      var _getMessageRoom = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(_, _ref5, _ref6) {
         var roomId, request, isAuthenticated, prisma, id, isExistRoom;
         return _regenerator["default"].wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                roomId = _ref6.roomId;
-                request = _ref7.request, isAuthenticated = _ref7.isAuthenticated, prisma = _ref7.prisma;
+                roomId = _ref5.roomId;
+                request = _ref6.request, isAuthenticated = _ref6.isAuthenticated, prisma = _ref6.prisma;
                 isAuthenticated({
                   request: request
                 });
@@ -176,14 +160,14 @@ module.exports = {
   Mutation: {
     // 사용자 추가
     addUser: function () {
-      var _addUser = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(_, args, _ref8) {
-        var prisma, email, pwd, nickname, firstname, lastname, file, isExistEmail, isExistNickname, hashedPassword, newUser;
+      var _addUser = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(_, args, _ref7) {
+        var prisma, email, pwd, nickname, file, isExistEmail, isExistNickname, hashedPassword;
         return _regenerator["default"].wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                prisma = _ref8.prisma;
-                email = args.email, pwd = args.pwd, nickname = args.nickname, firstname = args.firstname, lastname = args.lastname, file = args.file;
+                prisma = _ref7.prisma;
+                email = args.email, pwd = args.pwd, nickname = args.nickname, file = args.file;
                 _context3.next = 4;
                 return prisma.$exists.user({
                   email: email
@@ -226,32 +210,17 @@ module.exports = {
                   email: email,
                   pwd: hashedPassword,
                   nickname: nickname,
-                  firstname: firstname,
-                  lastname: lastname
-                });
-
-              case 17:
-                newUser = _context3.sent;
-
-                if (!file) {
-                  _context3.next = 21;
-                  break;
-                }
-
-                _context3.next = 21;
-                return prisma.createImage({
-                  url: file,
-                  user: {
-                    connect: {
-                      id: newUser.id
+                  avatar: {
+                    create: {
+                      url: file
                     }
                   }
                 });
 
-              case 21:
+              case 17:
                 return _context3.abrupt("return", true);
 
-              case 22:
+              case 18:
               case "end":
                 return _context3.stop();
             }
@@ -267,13 +236,13 @@ module.exports = {
     }(),
     // 사용자 정보 수정
     updateUser: function () {
-      var _updateUser = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(_, args, _ref9) {
+      var _updateUser = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(_, args, _ref8) {
         var request, isAuthenticated, prisma, nickname, file, id, isExistUser, updatedUser, filterOptions, isExistFile;
         return _regenerator["default"].wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                request = _ref9.request, isAuthenticated = _ref9.isAuthenticated, prisma = _ref9.prisma;
+                request = _ref8.request, isAuthenticated = _ref8.isAuthenticated, prisma = _ref8.prisma;
                 isAuthenticated({
                   request: request
                 });
@@ -360,159 +329,41 @@ module.exports = {
 
       return updateUser;
     }(),
-    // 인증 요청
-    requestSecret: function () {
-      var _requestSecret = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(_, args, _ref10) {
-        var prisma, email, loginSecret, isExistEmail;
+    // 로그인 요청
+    logIn: function () {
+      var _logIn = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(_, args, _ref9) {
+        var prisma, email, pwd, user, isCheckPwd;
         return _regenerator["default"].wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                prisma = _ref10.prisma;
-                email = args.email;
-                loginSecret = Array.from({
-                  length: 4
-                }).map(function (_) {
-                  return Math.floor(Math.random() * 9);
-                }).join(""); //try {
-                //  await sendMail({ email, loginSecret });
-                //} catch (e) {
-                //  console.log(e);
-                //  throw new Error("이메일 전송에 실패했습니다.");
-                //}
-
-                _context5.next = 5;
-                return prisma.$exists.user({
-                  email: email
-                });
-
-              case 5:
-                isExistEmail = _context5.sent;
-
-                if (isExistEmail) {
-                  _context5.next = 8;
-                  break;
-                }
-
-                throw Error("가입되지 않은 이메일입니다.");
-
-              case 8:
-                _context5.next = 10;
-                return prisma.updateUser({
-                  data: {
-                    loginSecret: loginSecret
-                  },
-                  where: {
-                    email: email
-                  }
-                });
-
-              case 10:
-                return _context5.abrupt("return", loginSecret);
-
-              case 11:
-              case "end":
-                return _context5.stop();
-            }
-          }
-        }, _callee5);
-      }));
-
-      function requestSecret(_x13, _x14, _x15) {
-        return _requestSecret.apply(this, arguments);
-      }
-
-      return requestSecret;
-    }(),
-    // 인증 확인
-    confirmSecret: function () {
-      var _confirmSecret = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6(_, args, _ref11) {
-        var prisma, email, secret, user;
-        return _regenerator["default"].wrap(function _callee6$(_context6) {
-          while (1) {
-            switch (_context6.prev = _context6.next) {
-              case 0:
-                prisma = _ref11.prisma;
-                email = args.email, secret = args.secret;
-                _context6.next = 4;
-                return prisma.user({
-                  email: email
-                });
-
-              case 4:
-                user = _context6.sent;
-
-                if (!(user.loginSecret === secret)) {
-                  _context6.next = 11;
-                  break;
-                }
-
-                _context6.next = 8;
-                return prisma.updateUser({
-                  where: {
-                    id: user.id
-                  },
-                  data: {
-                    loginSecret: ""
-                  }
-                });
-
-              case 8:
-                return _context6.abrupt("return", generateToken({
-                  id: user.id
-                }));
-
-              case 11:
-                throw Error("메일에 전송된 보안문자와 일치하지 않습니다.");
-
-              case 12:
-              case "end":
-                return _context6.stop();
-            }
-          }
-        }, _callee6);
-      }));
-
-      function confirmSecret(_x16, _x17, _x18) {
-        return _confirmSecret.apply(this, arguments);
-      }
-
-      return confirmSecret;
-    }(),
-    logIn: function () {
-      var _logIn = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee7(_, args, _ref12) {
-        var prisma, email, pwd, user, isCheckPwd;
-        return _regenerator["default"].wrap(function _callee7$(_context7) {
-          while (1) {
-            switch (_context7.prev = _context7.next) {
-              case 0:
-                prisma = _ref12.prisma;
+                prisma = _ref9.prisma;
                 email = args.email, pwd = args.pwd;
-                _context7.next = 4;
+                _context5.next = 4;
                 return prisma.user({
                   email: email
                 });
 
               case 4:
-                user = _context7.sent;
+                user = _context5.sent;
 
                 if (!user) {
-                  _context7.next = 16;
+                  _context5.next = 16;
                   break;
                 }
 
-                _context7.next = 8;
+                _context5.next = 8;
                 return bcrypt.compare(pwd, user.pwd);
 
               case 8:
-                isCheckPwd = _context7.sent;
+                isCheckPwd = _context5.sent;
 
                 if (!isCheckPwd) {
-                  _context7.next = 13;
+                  _context5.next = 13;
                   break;
                 }
 
-                return _context7.abrupt("return", generateToken({
+                return _context5.abrupt("return", generateToken({
                   id: user.id
                 }));
 
@@ -520,7 +371,7 @@ module.exports = {
                 throw Error("비밀번호를 확인하세요.");
 
               case 14:
-                _context7.next = 17;
+                _context5.next = 17;
                 break;
 
               case 16:
@@ -528,13 +379,13 @@ module.exports = {
 
               case 17:
               case "end":
-                return _context7.stop();
+                return _context5.stop();
             }
           }
-        }, _callee7);
+        }, _callee5);
       }));
 
-      function logIn(_x19, _x20, _x21) {
+      function logIn(_x13, _x14, _x15) {
         return _logIn.apply(this, arguments);
       }
 
@@ -542,20 +393,20 @@ module.exports = {
     }(),
     // 팔로우
     follow: function () {
-      var _follow = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee8(_, args, _ref13) {
+      var _follow = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6(_, args, _ref10) {
         var request, isAuthenticated, prisma, userId, id;
-        return _regenerator["default"].wrap(function _callee8$(_context8) {
+        return _regenerator["default"].wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
-                request = _ref13.request, isAuthenticated = _ref13.isAuthenticated, prisma = _ref13.prisma;
+                request = _ref10.request, isAuthenticated = _ref10.isAuthenticated, prisma = _ref10.prisma;
                 isAuthenticated({
                   request: request
                 });
                 userId = args.userId;
                 id = request.user.id;
-                _context8.prev = 4;
-                _context8.next = 7;
+                _context6.prev = 4;
+                _context6.next = 7;
                 return prisma.updateUser({
                   where: {
                     id: id
@@ -570,22 +421,22 @@ module.exports = {
                 });
 
               case 7:
-                return _context8.abrupt("return", true);
+                return _context6.abrupt("return", true);
 
               case 10:
-                _context8.prev = 10;
-                _context8.t0 = _context8["catch"](4);
-                return _context8.abrupt("return", false);
+                _context6.prev = 10;
+                _context6.t0 = _context6["catch"](4);
+                return _context6.abrupt("return", false);
 
               case 13:
               case "end":
-                return _context8.stop();
+                return _context6.stop();
             }
           }
-        }, _callee8, null, [[4, 10]]);
+        }, _callee6, null, [[4, 10]]);
       }));
 
-      function follow(_x22, _x23, _x24) {
+      function follow(_x16, _x17, _x18) {
         return _follow.apply(this, arguments);
       }
 
@@ -593,20 +444,20 @@ module.exports = {
     }(),
     // 언팔로우
     unfollow: function () {
-      var _unfollow = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee9(_, args, _ref14) {
+      var _unfollow = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee7(_, args, _ref11) {
         var request, isAuthenticated, prisma, userId, id;
-        return _regenerator["default"].wrap(function _callee9$(_context9) {
+        return _regenerator["default"].wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context9.prev = _context9.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
-                request = _ref14.request, isAuthenticated = _ref14.isAuthenticated, prisma = _ref14.prisma;
+                request = _ref11.request, isAuthenticated = _ref11.isAuthenticated, prisma = _ref11.prisma;
                 isAuthenticated({
                   request: request
                 });
                 userId = args.userId;
                 id = request.user.id;
-                _context9.prev = 4;
-                _context9.next = 7;
+                _context7.prev = 4;
+                _context7.next = 7;
                 return prisma.updateUser({
                   where: {
                     id: id
@@ -621,22 +472,22 @@ module.exports = {
                 });
 
               case 7:
-                return _context9.abrupt("return", true);
+                return _context7.abrupt("return", true);
 
               case 10:
-                _context9.prev = 10;
-                _context9.t0 = _context9["catch"](4);
-                return _context9.abrupt("return", false);
+                _context7.prev = 10;
+                _context7.t0 = _context7["catch"](4);
+                return _context7.abrupt("return", false);
 
               case 13:
               case "end":
-                return _context9.stop();
+                return _context7.stop();
             }
           }
-        }, _callee9, null, [[4, 10]]);
+        }, _callee7, null, [[4, 10]]);
       }));
 
-      function unfollow(_x25, _x26, _x27) {
+      function unfollow(_x19, _x20, _x21) {
         return _unfollow.apply(this, arguments);
       }
 
@@ -644,13 +495,13 @@ module.exports = {
     }(),
     // 메세지 전송
     addMessage: function () {
-      var _addMessage = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee10(_, args, _ref15) {
+      var _addMessage = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee8(_, args, _ref12) {
         var request, isAuthenticated, prisma, id, content, roomId, to, param, room;
-        return _regenerator["default"].wrap(function _callee10$(_context10) {
+        return _regenerator["default"].wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context10.prev = _context10.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
-                request = _ref15.request, isAuthenticated = _ref15.isAuthenticated, prisma = _ref15.prisma;
+                request = _ref12.request, isAuthenticated = _ref12.isAuthenticated, prisma = _ref12.prisma;
                 isAuthenticated({
                   request: request
                 });
@@ -667,7 +518,7 @@ module.exports = {
                 }; // 방 메세지 전송 시
 
                 if (!roomId) {
-                  _context10.next = 12;
+                  _context8.next = 12;
                   break;
                 }
 
@@ -676,19 +527,19 @@ module.exports = {
                     id: roomId
                   }
                 };
-                _context10.next = 9;
+                _context8.next = 9;
                 return prisma.messageRoom({
                   id: roomId
                 });
 
               case 9:
-                room = _context10.sent;
-                _context10.next = 17;
+                room = _context8.sent;
+                _context8.next = 17;
                 break;
 
               case 12:
                 if (!(id !== to)) {
-                  _context10.next = 17;
+                  _context8.next = 17;
                   break;
                 }
 
@@ -697,7 +548,7 @@ module.exports = {
                     id: to
                   }
                 };
-                _context10.next = 16;
+                _context8.next = 16;
                 return prisma.createMessageRoom({
                   participants: {
                     connect: {
@@ -707,32 +558,32 @@ module.exports = {
                 });
 
               case 16:
-                room = _context10.sent;
+                room = _context8.sent;
 
               case 17:
                 if (room) {
-                  _context10.next = 19;
+                  _context8.next = 19;
                   break;
                 }
 
                 throw Error("잘못된 접근입니다.");
 
               case 19:
-                _context10.next = 21;
+                _context8.next = 21;
                 return prisma.createMessage(param);
 
               case 21:
-                return _context10.abrupt("return", true);
+                return _context8.abrupt("return", true);
 
               case 22:
               case "end":
-                return _context10.stop();
+                return _context8.stop();
             }
           }
-        }, _callee10);
+        }, _callee8);
       }));
 
-      function addMessage(_x28, _x29, _x30) {
+      function addMessage(_x22, _x23, _x24) {
         return _addMessage.apply(this, arguments);
       }
 
@@ -740,19 +591,19 @@ module.exports = {
     }(),
     // 알림 읽기
     readAlert: function () {
-      var _readAlert = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee11(_, args, _ref16) {
+      var _readAlert = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee9(_, args, _ref13) {
         var request, isAuthenticated, prisma, id, alertId, isExistAlert;
-        return _regenerator["default"].wrap(function _callee11$(_context11) {
+        return _regenerator["default"].wrap(function _callee9$(_context9) {
           while (1) {
-            switch (_context11.prev = _context11.next) {
+            switch (_context9.prev = _context9.next) {
               case 0:
-                request = _ref16.request, isAuthenticated = _ref16.isAuthenticated, prisma = _ref16.prisma;
+                request = _ref13.request, isAuthenticated = _ref13.isAuthenticated, prisma = _ref13.prisma;
                 isAuthenticated({
                   request: request
                 });
                 id = request.user.id;
                 alertId = args.alertId;
-                _context11.next = 6;
+                _context9.next = 6;
                 return prisma.$exists.alert({
                   id: alertId,
                   user: {
@@ -761,14 +612,14 @@ module.exports = {
                 });
 
               case 6:
-                isExistAlert = _context11.sent;
+                isExistAlert = _context9.sent;
 
                 if (!isExistAlert) {
-                  _context11.next = 13;
+                  _context9.next = 13;
                   break;
                 }
 
-                _context11.next = 10;
+                _context9.next = 10;
                 return prisma.deleteAlert({
                   where: {
                     id: alertId
@@ -776,20 +627,20 @@ module.exports = {
                 });
 
               case 10:
-                return _context11.abrupt("return", true);
+                return _context9.abrupt("return", true);
 
               case 13:
-                return _context11.abrupt("return", false);
+                return _context9.abrupt("return", false);
 
               case 14:
               case "end":
-                return _context11.stop();
+                return _context9.stop();
             }
           }
-        }, _callee11);
+        }, _callee9);
       }));
 
-      function readAlert(_x31, _x32, _x33) {
+      function readAlert(_x25, _x26, _x27) {
         return _readAlert.apply(this, arguments);
       }
 
@@ -799,8 +650,8 @@ module.exports = {
   Subscription: {
     // 메세지 갱신
     syncMessage: {
-      subscribe: function subscribe(_, args, _ref17) {
-        var prisma = _ref17.prisma;
+      subscribe: function subscribe(_, args, _ref14) {
+        var prisma = _ref14.prisma;
         var roomId = args.roomId;
         return prisma.$subscribe.message({
           AND: [{
@@ -814,9 +665,9 @@ module.exports = {
           }]
         }).node();
       },
-      resolve: function resolve(_ref18, _, _ref19) {
-        var id = _ref18.id;
-        var prisma = _ref19.prisma;
+      resolve: function resolve(_ref15, _, _ref16) {
+        var id = _ref15.id;
+        var prisma = _ref16.prisma;
         return prisma.message({
           id: id
         }).$fragment(MESSAGE_FRAGMENT);
@@ -826,9 +677,9 @@ module.exports = {
   // computed
   User: {
     // 내가 팔로우 중인 사용자인지 여부
-    isFollowing: function isFollowing(parent, _, _ref20) {
-      var request = _ref20.request,
-          prisma = _ref20.prisma;
+    isFollowing: function isFollowing(parent, _, _ref17) {
+      var request = _ref17.request,
+          prisma = _ref17.prisma;
       var id = request.user.id;
       var parentId = parent.id;
 
@@ -847,8 +698,8 @@ module.exports = {
       }
     },
     // 내정보인지 여부
-    isMe: function isMe(parent, _, _ref21) {
-      var request = _ref21.request;
+    isMe: function isMe(parent, _, _ref18) {
+      var request = _ref18.request;
       var id = request.user.id;
       var parentId = parent.id;
       return id === parentId;
@@ -857,13 +708,13 @@ module.exports = {
   MessageRoom: {
     // 최근 내 메세지
     recentMyMessage: function () {
-      var _recentMyMessage = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee12(parent, _, _ref22) {
+      var _recentMyMessage = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee10(parent, _, _ref19) {
         var request, prisma, id, parentId, filterOptions, isExistMessage;
-        return _regenerator["default"].wrap(function _callee12$(_context12) {
+        return _regenerator["default"].wrap(function _callee10$(_context10) {
           while (1) {
-            switch (_context12.prev = _context12.next) {
+            switch (_context10.prev = _context10.next) {
               case 0:
-                request = _ref22.request, prisma = _ref22.prisma;
+                request = _ref19.request, prisma = _ref19.prisma;
                 id = request.user.id;
                 parentId = parent.id;
                 filterOptions = {
@@ -877,35 +728,35 @@ module.exports = {
                     }
                   }]
                 };
-                _context12.next = 6;
+                _context10.next = 6;
                 return prisma.$exist.message(filterOptions);
 
               case 6:
-                isExistMessage = _context12.sent;
+                isExistMessage = _context10.sent;
 
                 if (!isExistMessage) {
-                  _context12.next = 11;
+                  _context10.next = 11;
                   break;
                 }
 
-                return _context12.abrupt("return", prisma.messages({
+                return _context10.abrupt("return", prisma.messages({
                   where: filterOptions,
                   first: 1,
                   orderBy: "updatedAt_DESC"
                 }));
 
               case 11:
-                return _context12.abrupt("return", null);
+                return _context10.abrupt("return", null);
 
               case 12:
               case "end":
-                return _context12.stop();
+                return _context10.stop();
             }
           }
-        }, _callee12);
+        }, _callee10);
       }));
 
-      function recentMyMessage(_x34, _x35, _x36) {
+      function recentMyMessage(_x28, _x29, _x30) {
         return _recentMyMessage.apply(this, arguments);
       }
 

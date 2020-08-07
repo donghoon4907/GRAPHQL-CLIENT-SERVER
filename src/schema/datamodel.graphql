@@ -12,7 +12,6 @@ type User {
   avatar: Image
   posts: [Post!]!
   likes: [Like!]!
-  loginSecret: String
   followedBy: [User!]!
   following: [User!]!
   rooms: [MessageRoom!]!
@@ -28,16 +27,11 @@ type Post {
   video: Video!
   user: User!
   likes: [Like!]!
-  comments: [Comment!]!
-  accepts: [Accept!]!
   createdAt: String!
   updatedAt: String!
   status: String!
   isLiked: Boolean!
-  isAccepted: Boolean!
   likeCount: Int!
-  commentCount: Int!
-  acceptCount: Int!
   isMyPost: Boolean!
   room: MessageRoom!
 }
@@ -46,21 +40,6 @@ type Like {
   id: ID!
   user: User!
   post: Post!
-}
-
-type Accept {
-  id: ID!
-  user: User!
-  post: Post!
-  status: String!
-}
-
-type Comment {
-  id: ID!
-  user: User!
-  post: Post!
-  content: String!
-  comments: [Comment!]!
 }
 
 type Image {
@@ -78,6 +57,7 @@ type Video {
   url_480p: String
   url_720p: String
   url_1080p: String
+  status: String
 }
 
 type MessageRoom {

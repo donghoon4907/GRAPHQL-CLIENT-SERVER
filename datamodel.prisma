@@ -1,8 +1,6 @@
 type User {
   id: ID! @id
   nickname: String! @unique
-  firstname: String!
-  lastname: String!
   email: String! @unique
   pwd: String! 
   isMaster: Boolean! @default(value: false)
@@ -11,9 +9,6 @@ type User {
   avatar: Image @relation(name: "AvartarOfUser", link: INLINE)
   posts: [Post!]! @relation(name: "PostOfUser", onDelete: CASCADE)
   likes: [Like!]! @relation(name: "LikeOfUser", onDelete: CASCADE)
-  comments: [Comment!]! @relation(name: "CommentOfUser", onDelete: CASCADE)
-  accepts: [Accept!]! @relation(name: "AcceptOfUser", onDelete: CASCADE)
-  loginSecret: String 
   followedBy: [User!]! @relation(name: "UserFollows", references: [id])
   following: [User!]! @relation(name: "UserFollows", references: [id])
   rooms: [MessageRoom!]! @relation(name: "MessageRoomOfUser")
@@ -27,8 +22,6 @@ type Post {
   video: Video!
   user: User! @relation(name: "PostOfUser")
   likes: [Like!]! @relation(name: "LikeOfPost", onDelete: CASCADE)
-  comments: [Comment!]! @relation(name: "CommentOfPost", onDelete: CASCADE)
-  accepts: [Accept!]! @relation(name: "AcceptOfPost", onDelete: CASCADE)
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
   status: PostStatus!
@@ -39,21 +32,6 @@ type Like {
   id: ID! @id
   user: User! @relation(name: "LikeOfUser")
   post: Post! @relation(name: "LikeOfPost")
-}
-
-type Accept {
-  id: ID! @id
-  user: User! @relation(name: "AcceptOfUser")
-  post: Post! @relation(name: "AcceptOfPost")
-  status: AcceptStatus!
-}
-
-type Comment {
-  id: ID! @id 
-  user: User! @relation(name: "CommentOfUser")
-  post: Post! @relation(name: "CommentOfPost")
-  content: String! @length(max: 500)
-  comments: [Comment!]!
 }
 
 type Image {
@@ -104,12 +82,6 @@ type Notice {
   description: String!
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
-}
-
-enum AcceptStatus {
-  REQUEST
-  RESOLVE
-  REJECT
 }
 
 enum PostStatus {

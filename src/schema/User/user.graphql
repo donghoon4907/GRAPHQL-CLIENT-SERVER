@@ -17,9 +17,7 @@ type Mutation {
     email: String!
     pwd: String!
     nickname: String!
-    firstname: String!
-    lastname: String!
-    file: String
+    file: String!
   ): Boolean!
 
   updateUser(nickname: String!, file: String): User!
