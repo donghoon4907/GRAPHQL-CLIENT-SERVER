@@ -1,9 +1,15 @@
-const { POST_FRAGMENT, ACCEPT_FRAGMENT } = require("../../fragment/post");
+const { POST_FRAGMENT } = require("../../fragment/post");
+const moment = require("moment");
 
 module.exports = {
   Query: {
     // 포스트 검색
-    getPosts: async (_, args, { prisma }) => {
+    getPosts: async (_, args, { request, isAuthenticated, prisma }) => {
+      isAuthenticated({ request });
+      const {
+        user: { id }
+      } = request;
+
       const {
         skip = 0,
         first = 30,
@@ -16,6 +22,31 @@ module.exports = {
       if (searchKeyword) {
         orFilter.push({ title_contains: searchKeyword });
         orFilter.push({ description_contains: searchKeyword });
+
+        const from = moment();
+        from.set({ hour: 0, minute: 0, second: 0 });
+        const to = moment();
+        to.set({ hour: 23, minute: 59, second: 59 });
+
+        const isExistSearchKeyword = await prisma.$exists.searchKeyword({
+          user: {
+            id
+          },
+          keyword: searchKeyword,
+          createdAt_gt: from,
+          createdAt_lt: to
+        });
+
+        if (!isExistSearchKeyword) {
+          await prisma.createSearchKeyword({
+            keyword: searchKeyword,
+            user: {
+              connect: {
+                id
+              }
+            }
+          });
+        }
       }
       const where =
         orFilter.length > 0
@@ -70,34 +101,30 @@ module.exports = {
     addPost: async (_, args, { request, isAuthenticated, prisma }) => {
       isAuthenticated({ request });
       const { title, description, status, file } = args;
-      const { user } = request;
+      const {
+        user: { id }
+      } = request;
 
-      const video = await prisma.createVideo({
-        url: file,
-        status: "queue"
-      });
-
-      const newPost = await prisma.createPost({
+      await prisma.createPost({
         title,
         description,
         status,
         user: {
-          connect: { id: user.id }
+          connect: { id }
         },
         video: {
-          connect: { id: video.id }
-        }
-      });
-
-      await prisma.createMessageRoom({
-        participants: {
-          connect: {
-            id: user.id
+          create: {
+            url: file,
+            status: "queue"
           }
         },
-        post: {
-          connect: {
-            id: newPost.id
+        room: {
+          create: {
+            participants: {
+              connect: {
+                id
+              }
+            }
           }
         }
       });

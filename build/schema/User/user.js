@@ -135,7 +135,10 @@ module.exports = {
                   break;
                 }
 
-                throw Error("접근 권한이 없습니다.");
+                throw Error(JSON.stringify({
+                  message: "접근할 수 없습니다",
+                  status: 403
+                }));
 
               case 9:
                 return _context2.abrupt("return", prisma.messageRoom({
@@ -181,7 +184,10 @@ module.exports = {
                   break;
                 }
 
-                throw Error("이미 등록된 이메일입니다.");
+                throw Error(JSON.stringify({
+                  message: "이미 등록된 이메일입니다.",
+                  status: 403
+                }));
 
               case 7:
                 _context3.next = 9;
@@ -197,7 +203,10 @@ module.exports = {
                   break;
                 }
 
-                throw Error("이미 존재하는 별명입니다.");
+                throw Error(JSON.stringify({
+                  message: "이미 존재하는 닉네임입니다.",
+                  status: 403
+                }));
 
               case 12:
                 _context3.next = 14;
@@ -237,7 +246,7 @@ module.exports = {
     // 사용자 정보 수정
     updateUser: function () {
       var _updateUser = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(_, args, _ref8) {
-        var request, isAuthenticated, prisma, nickname, file, id, isExistUser, updatedUser, filterOptions, isExistFile;
+        var request, isAuthenticated, prisma, pwd, nickname, file, id, findUser, data, isExistNickname, hashedPassword;
         return _regenerator["default"].wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
@@ -246,76 +255,100 @@ module.exports = {
                 isAuthenticated({
                   request: request
                 });
-                nickname = args.nickname, file = args.file;
+                pwd = args.pwd, nickname = args.nickname, file = args.file;
                 id = request.user.id;
                 _context4.next = 6;
-                return prisma.$exists.user({
+                return prisma.user({
                   id: id
                 });
 
               case 6:
-                isExistUser = _context4.sent;
+                findUser = _context4.sent;
 
-                if (!isExistUser) {
-                  _context4.next = 24;
+                if (!findUser) {
+                  _context4.next = 27;
                   break;
                 }
 
-                _context4.next = 10;
+                data = {};
+
+                if (!nickname) {
+                  _context4.next = 17;
+                  break;
+                }
+
+                if (!(nickname !== findUser.nickname)) {
+                  _context4.next = 17;
+                  break;
+                }
+
+                _context4.next = 13;
+                return prisma.$exist.user({
+                  nickname: nickname
+                });
+
+              case 13:
+                isExistNickname = _context4.sent;
+
+                if (!isExistNickname) {
+                  _context4.next = 16;
+                  break;
+                }
+
+                throw Error(JSON.stringify({
+                  message: "이미 존재하는 닉네임입니다.",
+                  status: 403
+                }));
+
+              case 16:
+                data["nickname"] = nickname;
+
+              case 17:
+                if (file) {
+                  if (file !== findUser.avatar().url) {
+                    data["avatar"] = {
+                      create: {
+                        url: file
+                      }
+                    };
+                  }
+                }
+
+                if (!pwd) {
+                  _context4.next = 23;
+                  break;
+                }
+
+                _context4.next = 21;
+                return bcrypt.hash(pwd, 12);
+
+              case 21:
+                hashedPassword = _context4.sent;
+                data["pwd"] = hashedPassword;
+
+              case 23:
+                _context4.next = 25;
                 return prisma.updateUser({
                   where: {
                     id: id
                   },
-                  data: {
-                    nickname: nickname
-                  }
+                  data: data
                 });
-
-              case 10:
-                updatedUser = _context4.sent;
-
-                if (!file) {
-                  _context4.next = 21;
-                  break;
-                }
-
-                filterOptions = {
-                  user: {
-                    id: id
-                  }
-                };
-                _context4.next = 15;
-                return prisma.$exists.file(filterOptions);
-
-              case 15:
-                isExistFile = _context4.sent;
-
-                if (!isExistFile) {
-                  _context4.next = 19;
-                  break;
-                }
-
-                _context4.next = 19;
-                return prisma.deleteManyFiles(filterOptions);
-
-              case 19:
-                _context4.next = 21;
-                return prisma.createFile({
-                  url: file,
-                  user: {
-                    connect: {
-                      id: id
-                    }
-                  }
-                });
-
-              case 21:
-                return _context4.abrupt("return", updatedUser);
-
-              case 24:
-                throw Error("존재하지 않는 사용자입니다.");
 
               case 25:
+                _context4.next = 28;
+                break;
+
+              case 27:
+                throw Error(JSON.stringify({
+                  message: "존재하지 않는 사용자입니다.",
+                  status: 403
+                }));
+
+              case 28:
+                return _context4.abrupt("return", true);
+
+              case 29:
               case "end":
                 return _context4.stop();
             }
@@ -368,14 +401,20 @@ module.exports = {
                 }));
 
               case 13:
-                throw Error("비밀번호를 확인하세요.");
+                throw Error(JSON.stringify({
+                  message: "비밀번호를 확인하세요.",
+                  status: 200
+                }));
 
               case 14:
                 _context5.next = 17;
                 break;
 
               case 16:
-                throw Error("존재하지 않는 이메일입니다.");
+                throw Error(JSON.stringify({
+                  message: "등록되지 않은 이메일입니다.",
+                  status: 403
+                }));
 
               case 17:
               case "end":
@@ -566,7 +605,10 @@ module.exports = {
                   break;
                 }
 
-                throw Error("잘못된 접근입니다.");
+                throw Error(JSON.stringify({
+                  message: "잘못된 접근입니다.",
+                  status: 403
+                }));
 
               case 19:
                 _context8.next = 21;

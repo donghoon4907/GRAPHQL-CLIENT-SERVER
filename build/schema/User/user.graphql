@@ -20,7 +20,7 @@ type Mutation {
     file: String!
   ): Boolean!
 
-  updateUser(nickname: String!, file: String): User!
+  updateUser(nickname: String, pwd: String, file: String): User!
 
   requestSecret(email: String!): String!
 

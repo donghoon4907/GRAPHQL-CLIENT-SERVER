@@ -84,6 +84,13 @@ type Notice {
   updatedAt: DateTime! @updatedAt
 }
 
+type SearchKeyword {
+  id: ID! @id
+  keyword: String!
+  createdAt: DateTime! @createdAt
+  user: User!
+}
+
 enum PostStatus {
   PUBLIC
   PRIVATE

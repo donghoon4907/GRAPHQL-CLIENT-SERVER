@@ -85,7 +85,12 @@ module.exports = {
       });
 
       if (!isExistRoom) {
-        throw Error("접근 권한이 없습니다.");
+        throw Error(
+          JSON.stringify({
+            message: "접근할 수 없습니다",
+            status: 403
+          })
+        );
       }
 
       return prisma
@@ -103,13 +108,23 @@ module.exports = {
       const isExistEmail = await prisma.$exists.user({ email });
 
       if (isExistEmail) {
-        throw Error("이미 등록된 이메일입니다.");
+        throw Error(
+          JSON.stringify({
+            message: "이미 등록된 이메일입니다.",
+            status: 403
+          })
+        );
       }
 
       const isExistNickname = await prisma.$exists.user({ nickname });
 
       if (isExistNickname) {
-        throw Error("이미 존재하는 별명입니다.");
+        throw Error(
+          JSON.stringify({
+            message: "이미 존재하는 닉네임입니다.",
+            status: 403
+          })
+        );
       }
 
       const hashedPassword = await bcrypt.hash(pwd, 12);
@@ -130,44 +145,57 @@ module.exports = {
     // 사용자 정보 수정
     updateUser: async (_, args, { request, isAuthenticated, prisma }) => {
       isAuthenticated({ request });
-      const { nickname, file } = args;
+      const { pwd, nickname, file } = args;
       const {
         user: { id }
       } = request;
 
-      const isExistUser = await prisma.$exists.user({ id });
+      const findUser = await prisma.user({ id });
 
-      if (isExistUser) {
-        const updatedUser = await prisma.updateUser({
-          where: { id },
-          data: {
-            nickname
-          }
-        });
-
-        if (file) {
-          const filterOptions = {
-            user: {
-              id
+      if (findUser) {
+        const data = {};
+        if (nickname) {
+          if (nickname !== findUser.nickname) {
+            const isExistNickname = await prisma.$exist.user({ nickname });
+            if (isExistNickname) {
+              throw Error(
+                JSON.stringify({
+                  message: "이미 존재하는 닉네임입니다.",
+                  status: 403
+                })
+              );
             }
-          };
-
-          const isExistFile = await prisma.$exists.file(filterOptions);
-          if (isExistFile) {
-            await prisma.deleteManyFiles(filterOptions);
+            data["nickname"] = nickname;
           }
-
-          await prisma.createFile({
-            url: file,
-            user: {
-              connect: { id }
-            }
-          });
         }
-        return updatedUser;
+        if (file) {
+          if (file !== findUser.avatar().url) {
+            data["avatar"] = {
+              create: {
+                url: file
+              }
+            };
+          }
+        }
+        if (pwd) {
+          const hashedPassword = await bcrypt.hash(pwd, 12);
+          data["pwd"] = hashedPassword;
+        }
+
+        await prisma.updateUser({
+          where: { id },
+          data
+        });
       } else {
-        throw Error("존재하지 않는 사용자입니다.");
+        throw Error(
+          JSON.stringify({
+            message: "존재하지 않는 사용자입니다.",
+            status: 403
+          })
+        );
       }
+
+      return true;
     },
     // 로그인 요청
     logIn: async (_, args, { prisma }) => {
@@ -181,10 +209,20 @@ module.exports = {
         if (isCheckPwd) {
           return generateToken({ id: user.id });
         } else {
-          throw Error("비밀번호를 확인하세요.");
+          throw Error(
+            JSON.stringify({
+              message: "비밀번호를 확인하세요.",
+              status: 200
+            })
+          );
         }
       } else {
-        throw Error("존재하지 않는 이메일입니다.");
+        throw Error(
+          JSON.stringify({
+            message: "등록되지 않은 이메일입니다.",
+            status: 403
+          })
+        );
       }
     },
     // 팔로우
@@ -275,7 +313,12 @@ module.exports = {
         }
       }
       if (!room) {
-        throw Error("잘못된 접근입니다.");
+        throw Error(
+          JSON.stringify({
+            message: "잘못된 접근입니다.",
+            status: 403
+          })
+        );
       }
 
       await prisma.createMessage(param);

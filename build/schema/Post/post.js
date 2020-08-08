@@ -7,33 +7,81 @@ var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"))
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 
 var _require = require("../../fragment/post"),
-    POST_FRAGMENT = _require.POST_FRAGMENT,
-    ACCEPT_FRAGMENT = _require.ACCEPT_FRAGMENT;
+    POST_FRAGMENT = _require.POST_FRAGMENT;
+
+var moment = require("moment");
 
 module.exports = {
   Query: {
     // 포스트 검색
     getPosts: function () {
       var _getPosts = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(_, args, _ref) {
-        var prisma, _args$skip, skip, _args$first, first, _args$orderBy, orderBy, searchKeyword, orFilter, where;
+        var request, isAuthenticated, prisma, id, _args$skip, skip, _args$first, first, _args$orderBy, orderBy, searchKeyword, orFilter, from, to, isExistSearchKeyword, where;
 
         return _regenerator["default"].wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                prisma = _ref.prisma;
+                request = _ref.request, isAuthenticated = _ref.isAuthenticated, prisma = _ref.prisma;
+                isAuthenticated({
+                  request: request
+                });
+                id = request.user.id;
                 _args$skip = args.skip, skip = _args$skip === void 0 ? 0 : _args$skip, _args$first = args.first, first = _args$first === void 0 ? 30 : _args$first, _args$orderBy = args.orderBy, orderBy = _args$orderBy === void 0 ? "createdAt_DESC" : _args$orderBy, searchKeyword = args.searchKeyword;
                 orFilter = [];
 
-                if (searchKeyword) {
-                  orFilter.push({
-                    title_contains: searchKeyword
-                  });
-                  orFilter.push({
-                    description_contains: searchKeyword
-                  });
+                if (!searchKeyword) {
+                  _context.next = 18;
+                  break;
                 }
 
+                orFilter.push({
+                  title_contains: searchKeyword
+                });
+                orFilter.push({
+                  description_contains: searchKeyword
+                });
+                from = moment();
+                from.set({
+                  hour: 0,
+                  minute: 0,
+                  second: 0
+                });
+                to = moment();
+                to.set({
+                  hour: 23,
+                  minute: 59,
+                  second: 59
+                });
+                _context.next = 14;
+                return prisma.$exists.searchKeyword({
+                  user: {
+                    id: id
+                  },
+                  keyword: searchKeyword,
+                  createdAt_gt: from,
+                  createdAt_lt: to
+                });
+
+              case 14:
+                isExistSearchKeyword = _context.sent;
+
+                if (isExistSearchKeyword) {
+                  _context.next = 18;
+                  break;
+                }
+
+                _context.next = 18;
+                return prisma.createSearchKeyword({
+                  keyword: searchKeyword,
+                  user: {
+                    connect: {
+                      id: id
+                    }
+                  }
+                });
+
+              case 18:
                 where = orFilter.length > 0 ? {
                   OR: orFilter // video: {
                   //   status: "complete"
@@ -47,7 +95,7 @@ module.exports = {
                   orderBy: orderBy
                 }).$fragment(POST_FRAGMENT));
 
-              case 6:
+              case 20:
               case "end":
                 return _context.stop();
             }
@@ -123,7 +171,7 @@ module.exports = {
     // 포스트 추가
     addPost: function () {
       var _addPost = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(_, args, _ref4) {
-        var request, isAuthenticated, prisma, title, description, status, file, user, video, newPost;
+        var request, isAuthenticated, prisma, title, description, status, file, id;
         return _regenerator["default"].wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -133,52 +181,38 @@ module.exports = {
                   request: request
                 });
                 title = args.title, description = args.description, status = args.status, file = args.file;
-                user = request.user;
+                id = request.user.id;
                 _context3.next = 6;
-                return prisma.createVideo({
-                  url: file,
-                  status: "queue"
-                });
-
-              case 6:
-                video = _context3.sent;
-                _context3.next = 9;
                 return prisma.createPost({
                   title: title,
                   description: description,
                   status: status,
                   user: {
                     connect: {
-                      id: user.id
+                      id: id
                     }
                   },
                   video: {
-                    connect: {
-                      id: video.id
-                    }
-                  }
-                });
-
-              case 9:
-                newPost = _context3.sent;
-                _context3.next = 12;
-                return prisma.createMessageRoom({
-                  participants: {
-                    connect: {
-                      id: user.id
+                    create: {
+                      url: file,
+                      status: "queue"
                     }
                   },
-                  post: {
-                    connect: {
-                      id: newPost.id
+                  room: {
+                    create: {
+                      participants: {
+                        connect: {
+                          id: id
+                        }
+                      }
                     }
                   }
                 });
 
-              case 12:
+              case 6:
                 return _context3.abrupt("return", true);
 
-              case 13:
+              case 7:
               case "end":
                 return _context3.stop();
             }

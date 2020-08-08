@@ -56,8 +56,8 @@ module.exports = {
         return false;
       }
     },
-    // 포스트 삭제
-    deletePost: async (_, args, { request, isAuthenticated, prisma }) => {
+    // 공지 삭제
+    deleteNotice: async (_, args, { request, isAuthenticated, prisma }) => {
       isAuthenticated({ request });
       const { noticeId } = args;
 

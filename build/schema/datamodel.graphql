@@ -94,6 +94,13 @@ type Notice {
   updatedAt: String!
 }
 
+type SearchKeyword {
+  id: ID!
+  keyword: String!
+  createdAt: String!
+  user: User!
+}
+
 type File {
   filename: String!
   mimetype: String!

@@ -145,9 +145,9 @@ module.exports = {
 
       return updateNotice;
     }(),
-    // 포스트 삭제
-    deletePost: function () {
-      var _deletePost = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(_, args, _ref5) {
+    // 공지 삭제
+    deleteNotice: function () {
+      var _deleteNotice = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(_, args, _ref5) {
         var request, isAuthenticated, prisma, noticeId, isExistNotice;
         return _regenerator["default"].wrap(function _callee4$(_context4) {
           while (1) {
@@ -190,11 +190,11 @@ module.exports = {
         }, _callee4);
       }));
 
-      function deletePost(_x10, _x11, _x12) {
-        return _deletePost.apply(this, arguments);
+      function deleteNotice(_x10, _x11, _x12) {
+        return _deleteNotice.apply(this, arguments);
       }
 
-      return deletePost;
+      return deleteNotice;
     }()
   }
 };
