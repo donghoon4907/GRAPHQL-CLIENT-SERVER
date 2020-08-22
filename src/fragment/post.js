@@ -21,7 +21,10 @@ exports.POST_FRAGMENT = `
       }
     }
     likes {
-      id 
+      id
+      user {
+        id
+      }
     }
     status
     room {

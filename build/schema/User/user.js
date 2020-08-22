@@ -12,6 +12,7 @@ var generateToken = require("../../module/token");
 
 var _require = require("../../fragment/user"),
     USER_FRAGMENT = _require.USER_FRAGMENT,
+    LOGIN_FRAGMENT = _require.LOGIN_FRAGMENT,
     MESSAGEROOM_FRAGMENT = _require.MESSAGEROOM_FRAGMENT,
     MESSAGE_FRAGMENT = _require.MESSAGE_FRAGMENT;
 
@@ -60,19 +61,47 @@ module.exports = {
 
       return getUsers;
     }(),
+    // 추천 사용자 검색
+    getRecommandUsers: function () {
+      var _getRecommandUsers = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(_, __, _ref2) {
+        var prisma;
+        return _regenerator["default"].wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                prisma = _ref2.prisma;
+                return _context2.abrupt("return", prisma.users({
+                  first: 3,
+                  orderBy: "createdAt_DESC"
+                }).$fragment(USER_FRAGMENT));
+
+              case 2:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2);
+      }));
+
+      function getRecommandUsers(_x4, _x5, _x6) {
+        return _getRecommandUsers.apply(this, arguments);
+      }
+
+      return getRecommandUsers;
+    }(),
     // 사용자 정보
-    getUser: function getUser(_, args, _ref2) {
-      var prisma = _ref2.prisma;
+    getUser: function getUser(_, args, _ref3) {
+      var prisma = _ref3.prisma;
       var userId = args.userId;
       return prisma.user({
         id: userId
       }).$fragment(USER_FRAGMENT);
     },
     // 내정보
-    getMyProfile: function getMyProfile(_, __, _ref3) {
-      var request = _ref3.request,
-          isAuthenticated = _ref3.isAuthenticated,
-          prisma = _ref3.prisma;
+    getMyProfile: function getMyProfile(_, __, _ref4) {
+      var request = _ref4.request,
+          isAuthenticated = _ref4.isAuthenticated,
+          prisma = _ref4.prisma;
       isAuthenticated({
         request: request
       });
@@ -82,10 +111,10 @@ module.exports = {
       }).$fragment(USER_FRAGMENT);
     },
     // 메시지방 검색
-    getMessageRooms: function getMessageRooms(_, args, _ref4) {
-      var request = _ref4.request,
-          isAuthenticated = _ref4.isAuthenticated,
-          prisma = _ref4.prisma;
+    getMessageRooms: function getMessageRooms(_, args, _ref5) {
+      var request = _ref5.request,
+          isAuthenticated = _ref5.isAuthenticated,
+          prisma = _ref5.prisma;
       isAuthenticated({
         request: request
       });
@@ -105,19 +134,19 @@ module.exports = {
     },
     // 메시지방 상세 조회
     getMessageRoom: function () {
-      var _getMessageRoom = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(_, _ref5, _ref6) {
+      var _getMessageRoom = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(_, _ref6, _ref7) {
         var roomId, request, isAuthenticated, prisma, id, isExistRoom;
-        return _regenerator["default"].wrap(function _callee2$(_context2) {
+        return _regenerator["default"].wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
-                roomId = _ref5.roomId;
-                request = _ref6.request, isAuthenticated = _ref6.isAuthenticated, prisma = _ref6.prisma;
+                roomId = _ref6.roomId;
+                request = _ref7.request, isAuthenticated = _ref7.isAuthenticated, prisma = _ref7.prisma;
                 isAuthenticated({
                   request: request
                 });
                 id = request.user.id;
-                _context2.next = 6;
+                _context3.next = 6;
                 return prisma.messageRooms({
                   where: {
                     id: roomId,
@@ -128,10 +157,10 @@ module.exports = {
                 });
 
               case 6:
-                isExistRoom = _context2.sent;
+                isExistRoom = _context3.sent;
 
                 if (isExistRoom) {
-                  _context2.next = 9;
+                  _context3.next = 9;
                   break;
                 }
 
@@ -141,19 +170,19 @@ module.exports = {
                 }));
 
               case 9:
-                return _context2.abrupt("return", prisma.messageRoom({
+                return _context3.abrupt("return", prisma.messageRoom({
                   id: roomId
                 }).$fragment(MESSAGEROOM_FRAGMENT));
 
               case 10:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2);
+        }, _callee3);
       }));
 
-      function getMessageRoom(_x4, _x5, _x6) {
+      function getMessageRoom(_x7, _x8, _x9) {
         return _getMessageRoom.apply(this, arguments);
       }
 
@@ -163,24 +192,24 @@ module.exports = {
   Mutation: {
     // 사용자 추가
     addUser: function () {
-      var _addUser = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(_, args, _ref7) {
+      var _addUser = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(_, args, _ref8) {
         var prisma, email, pwd, nickname, file, isExistEmail, isExistNickname, hashedPassword;
-        return _regenerator["default"].wrap(function _callee3$(_context3) {
+        return _regenerator["default"].wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                prisma = _ref7.prisma;
+                prisma = _ref8.prisma;
                 email = args.email, pwd = args.pwd, nickname = args.nickname, file = args.file;
-                _context3.next = 4;
+                _context4.next = 4;
                 return prisma.$exists.user({
                   email: email
                 });
 
               case 4:
-                isExistEmail = _context3.sent;
+                isExistEmail = _context4.sent;
 
                 if (!isExistEmail) {
-                  _context3.next = 7;
+                  _context4.next = 7;
                   break;
                 }
 
@@ -190,16 +219,16 @@ module.exports = {
                 }));
 
               case 7:
-                _context3.next = 9;
+                _context4.next = 9;
                 return prisma.$exists.user({
                   nickname: nickname
                 });
 
               case 9:
-                isExistNickname = _context3.sent;
+                isExistNickname = _context4.sent;
 
                 if (!isExistNickname) {
-                  _context3.next = 12;
+                  _context4.next = 12;
                   break;
                 }
 
@@ -209,12 +238,12 @@ module.exports = {
                 }));
 
               case 12:
-                _context3.next = 14;
+                _context4.next = 14;
                 return bcrypt.hash(pwd, 12);
 
               case 14:
-                hashedPassword = _context3.sent;
-                _context3.next = 17;
+                hashedPassword = _context4.sent;
+                _context4.next = 17;
                 return prisma.createUser({
                   email: email,
                   pwd: hashedPassword,
@@ -227,17 +256,17 @@ module.exports = {
                 });
 
               case 17:
-                return _context3.abrupt("return", true);
+                return _context4.abrupt("return", true);
 
               case 18:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3);
+        }, _callee4);
       }));
 
-      function addUser(_x7, _x8, _x9) {
+      function addUser(_x10, _x11, _x12) {
         return _addUser.apply(this, arguments);
       }
 
@@ -245,53 +274,53 @@ module.exports = {
     }(),
     // 사용자 정보 수정
     updateUser: function () {
-      var _updateUser = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(_, args, _ref8) {
+      var _updateUser = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(_, args, _ref9) {
         var request, isAuthenticated, prisma, pwd, nickname, file, id, findUser, data, isExistNickname, hashedPassword;
-        return _regenerator["default"].wrap(function _callee4$(_context4) {
+        return _regenerator["default"].wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
-                request = _ref8.request, isAuthenticated = _ref8.isAuthenticated, prisma = _ref8.prisma;
+                request = _ref9.request, isAuthenticated = _ref9.isAuthenticated, prisma = _ref9.prisma;
                 isAuthenticated({
                   request: request
                 });
                 pwd = args.pwd, nickname = args.nickname, file = args.file;
                 id = request.user.id;
-                _context4.next = 6;
+                _context5.next = 6;
                 return prisma.user({
                   id: id
                 });
 
               case 6:
-                findUser = _context4.sent;
+                findUser = _context5.sent;
 
                 if (!findUser) {
-                  _context4.next = 27;
+                  _context5.next = 27;
                   break;
                 }
 
                 data = {};
 
                 if (!nickname) {
-                  _context4.next = 17;
+                  _context5.next = 17;
                   break;
                 }
 
                 if (!(nickname !== findUser.nickname)) {
-                  _context4.next = 17;
+                  _context5.next = 17;
                   break;
                 }
 
-                _context4.next = 13;
+                _context5.next = 13;
                 return prisma.$exist.user({
                   nickname: nickname
                 });
 
               case 13:
-                isExistNickname = _context4.sent;
+                isExistNickname = _context5.sent;
 
                 if (!isExistNickname) {
-                  _context4.next = 16;
+                  _context5.next = 16;
                   break;
                 }
 
@@ -315,19 +344,19 @@ module.exports = {
                 }
 
                 if (!pwd) {
-                  _context4.next = 23;
+                  _context5.next = 23;
                   break;
                 }
 
-                _context4.next = 21;
+                _context5.next = 21;
                 return bcrypt.hash(pwd, 12);
 
               case 21:
-                hashedPassword = _context4.sent;
+                hashedPassword = _context5.sent;
                 data["pwd"] = hashedPassword;
 
               case 23:
-                _context4.next = 25;
+                _context5.next = 25;
                 return prisma.updateUser({
                   where: {
                     id: id
@@ -336,7 +365,7 @@ module.exports = {
                 });
 
               case 25:
-                _context4.next = 28;
+                _context5.next = 28;
                 break;
 
               case 27:
@@ -346,77 +375,9 @@ module.exports = {
                 }));
 
               case 28:
-                return _context4.abrupt("return", true);
+                return _context5.abrupt("return", true);
 
               case 29:
-              case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4);
-      }));
-
-      function updateUser(_x10, _x11, _x12) {
-        return _updateUser.apply(this, arguments);
-      }
-
-      return updateUser;
-    }(),
-    // 로그인 요청
-    logIn: function () {
-      var _logIn = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(_, args, _ref9) {
-        var prisma, email, pwd, user, isCheckPwd;
-        return _regenerator["default"].wrap(function _callee5$(_context5) {
-          while (1) {
-            switch (_context5.prev = _context5.next) {
-              case 0:
-                prisma = _ref9.prisma;
-                email = args.email, pwd = args.pwd;
-                _context5.next = 4;
-                return prisma.user({
-                  email: email
-                });
-
-              case 4:
-                user = _context5.sent;
-
-                if (!user) {
-                  _context5.next = 16;
-                  break;
-                }
-
-                _context5.next = 8;
-                return bcrypt.compare(pwd, user.pwd);
-
-              case 8:
-                isCheckPwd = _context5.sent;
-
-                if (!isCheckPwd) {
-                  _context5.next = 13;
-                  break;
-                }
-
-                return _context5.abrupt("return", generateToken({
-                  id: user.id
-                }));
-
-              case 13:
-                throw Error(JSON.stringify({
-                  message: "비밀번호를 확인하세요.",
-                  status: 200
-                }));
-
-              case 14:
-                _context5.next = 17;
-                break;
-
-              case 16:
-                throw Error(JSON.stringify({
-                  message: "등록되지 않은 이메일입니다.",
-                  status: 403
-                }));
-
-              case 17:
               case "end":
                 return _context5.stop();
             }
@@ -424,7 +385,84 @@ module.exports = {
         }, _callee5);
       }));
 
-      function logIn(_x13, _x14, _x15) {
+      function updateUser(_x13, _x14, _x15) {
+        return _updateUser.apply(this, arguments);
+      }
+
+      return updateUser;
+    }(),
+    // 로그인 요청
+    logIn: function () {
+      var _logIn = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6(_, args, _ref10) {
+        var prisma, email, pwd, user, isCheckPwd, id, nickname, _email, avatar, isMaster;
+
+        return _regenerator["default"].wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                prisma = _ref10.prisma;
+                email = args.email, pwd = args.pwd;
+                _context6.next = 4;
+                return prisma.user({
+                  email: email
+                }).$fragment(LOGIN_FRAGMENT);
+
+              case 4:
+                user = _context6.sent;
+
+                if (!user) {
+                  _context6.next = 17;
+                  break;
+                }
+
+                _context6.next = 8;
+                return bcrypt.compare(pwd, user.pwd);
+
+              case 8:
+                isCheckPwd = _context6.sent;
+
+                if (!isCheckPwd) {
+                  _context6.next = 14;
+                  break;
+                }
+
+                id = user.id, nickname = user.nickname, _email = user.email, avatar = user.avatar, isMaster = user.isMaster;
+                return _context6.abrupt("return", {
+                  token: generateToken({
+                    id: user.id
+                  }),
+                  id: id,
+                  nickname: nickname,
+                  email: _email,
+                  avatar: avatar,
+                  isMaster: isMaster
+                });
+
+              case 14:
+                throw Error(JSON.stringify({
+                  message: "비밀번호를 확인하세요.",
+                  status: 200
+                }));
+
+              case 15:
+                _context6.next = 18;
+                break;
+
+              case 17:
+                throw Error(JSON.stringify({
+                  message: "등록되지 않은 이메일입니다.",
+                  status: 403
+                }));
+
+              case 18:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6);
+      }));
+
+      function logIn(_x16, _x17, _x18) {
         return _logIn.apply(this, arguments);
       }
 
@@ -432,58 +470,7 @@ module.exports = {
     }(),
     // 팔로우
     follow: function () {
-      var _follow = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6(_, args, _ref10) {
-        var request, isAuthenticated, prisma, userId, id;
-        return _regenerator["default"].wrap(function _callee6$(_context6) {
-          while (1) {
-            switch (_context6.prev = _context6.next) {
-              case 0:
-                request = _ref10.request, isAuthenticated = _ref10.isAuthenticated, prisma = _ref10.prisma;
-                isAuthenticated({
-                  request: request
-                });
-                userId = args.userId;
-                id = request.user.id;
-                _context6.prev = 4;
-                _context6.next = 7;
-                return prisma.updateUser({
-                  where: {
-                    id: id
-                  },
-                  data: {
-                    following: {
-                      connect: {
-                        id: userId
-                      }
-                    }
-                  }
-                });
-
-              case 7:
-                return _context6.abrupt("return", true);
-
-              case 10:
-                _context6.prev = 10;
-                _context6.t0 = _context6["catch"](4);
-                return _context6.abrupt("return", false);
-
-              case 13:
-              case "end":
-                return _context6.stop();
-            }
-          }
-        }, _callee6, null, [[4, 10]]);
-      }));
-
-      function follow(_x16, _x17, _x18) {
-        return _follow.apply(this, arguments);
-      }
-
-      return follow;
-    }(),
-    // 언팔로우
-    unfollow: function () {
-      var _unfollow = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee7(_, args, _ref11) {
+      var _follow = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee7(_, args, _ref11) {
         var request, isAuthenticated, prisma, userId, id;
         return _regenerator["default"].wrap(function _callee7$(_context7) {
           while (1) {
@@ -503,7 +490,7 @@ module.exports = {
                   },
                   data: {
                     following: {
-                      disconnect: {
+                      connect: {
                         id: userId
                       }
                     }
@@ -526,7 +513,58 @@ module.exports = {
         }, _callee7, null, [[4, 10]]);
       }));
 
-      function unfollow(_x19, _x20, _x21) {
+      function follow(_x19, _x20, _x21) {
+        return _follow.apply(this, arguments);
+      }
+
+      return follow;
+    }(),
+    // 언팔로우
+    unfollow: function () {
+      var _unfollow = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee8(_, args, _ref12) {
+        var request, isAuthenticated, prisma, userId, id;
+        return _regenerator["default"].wrap(function _callee8$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
+              case 0:
+                request = _ref12.request, isAuthenticated = _ref12.isAuthenticated, prisma = _ref12.prisma;
+                isAuthenticated({
+                  request: request
+                });
+                userId = args.userId;
+                id = request.user.id;
+                _context8.prev = 4;
+                _context8.next = 7;
+                return prisma.updateUser({
+                  where: {
+                    id: id
+                  },
+                  data: {
+                    following: {
+                      disconnect: {
+                        id: userId
+                      }
+                    }
+                  }
+                });
+
+              case 7:
+                return _context8.abrupt("return", true);
+
+              case 10:
+                _context8.prev = 10;
+                _context8.t0 = _context8["catch"](4);
+                return _context8.abrupt("return", false);
+
+              case 13:
+              case "end":
+                return _context8.stop();
+            }
+          }
+        }, _callee8, null, [[4, 10]]);
+      }));
+
+      function unfollow(_x22, _x23, _x24) {
         return _unfollow.apply(this, arguments);
       }
 
@@ -534,13 +572,13 @@ module.exports = {
     }(),
     // 메세지 전송
     addMessage: function () {
-      var _addMessage = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee8(_, args, _ref12) {
+      var _addMessage = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee9(_, args, _ref13) {
         var request, isAuthenticated, prisma, id, content, roomId, to, param, room;
-        return _regenerator["default"].wrap(function _callee8$(_context8) {
+        return _regenerator["default"].wrap(function _callee9$(_context9) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context9.prev = _context9.next) {
               case 0:
-                request = _ref12.request, isAuthenticated = _ref12.isAuthenticated, prisma = _ref12.prisma;
+                request = _ref13.request, isAuthenticated = _ref13.isAuthenticated, prisma = _ref13.prisma;
                 isAuthenticated({
                   request: request
                 });
@@ -557,7 +595,7 @@ module.exports = {
                 }; // 방 메세지 전송 시
 
                 if (!roomId) {
-                  _context8.next = 12;
+                  _context9.next = 12;
                   break;
                 }
 
@@ -566,19 +604,19 @@ module.exports = {
                     id: roomId
                   }
                 };
-                _context8.next = 9;
+                _context9.next = 9;
                 return prisma.messageRoom({
                   id: roomId
                 });
 
               case 9:
-                room = _context8.sent;
-                _context8.next = 17;
+                room = _context9.sent;
+                _context9.next = 17;
                 break;
 
               case 12:
                 if (!(id !== to)) {
-                  _context8.next = 17;
+                  _context9.next = 17;
                   break;
                 }
 
@@ -587,7 +625,7 @@ module.exports = {
                     id: to
                   }
                 };
-                _context8.next = 16;
+                _context9.next = 16;
                 return prisma.createMessageRoom({
                   participants: {
                     connect: {
@@ -597,11 +635,11 @@ module.exports = {
                 });
 
               case 16:
-                room = _context8.sent;
+                room = _context9.sent;
 
               case 17:
                 if (room) {
-                  _context8.next = 19;
+                  _context9.next = 19;
                   break;
                 }
 
@@ -611,21 +649,21 @@ module.exports = {
                 }));
 
               case 19:
-                _context8.next = 21;
+                _context9.next = 21;
                 return prisma.createMessage(param);
 
               case 21:
-                return _context8.abrupt("return", true);
+                return _context9.abrupt("return", true);
 
               case 22:
               case "end":
-                return _context8.stop();
+                return _context9.stop();
             }
           }
-        }, _callee8);
+        }, _callee9);
       }));
 
-      function addMessage(_x22, _x23, _x24) {
+      function addMessage(_x25, _x26, _x27) {
         return _addMessage.apply(this, arguments);
       }
 
@@ -633,19 +671,19 @@ module.exports = {
     }(),
     // 알림 읽기
     readAlert: function () {
-      var _readAlert = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee9(_, args, _ref13) {
+      var _readAlert = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee10(_, args, _ref14) {
         var request, isAuthenticated, prisma, id, alertId, isExistAlert;
-        return _regenerator["default"].wrap(function _callee9$(_context9) {
+        return _regenerator["default"].wrap(function _callee10$(_context10) {
           while (1) {
-            switch (_context9.prev = _context9.next) {
+            switch (_context10.prev = _context10.next) {
               case 0:
-                request = _ref13.request, isAuthenticated = _ref13.isAuthenticated, prisma = _ref13.prisma;
+                request = _ref14.request, isAuthenticated = _ref14.isAuthenticated, prisma = _ref14.prisma;
                 isAuthenticated({
                   request: request
                 });
                 id = request.user.id;
                 alertId = args.alertId;
-                _context9.next = 6;
+                _context10.next = 6;
                 return prisma.$exists.alert({
                   id: alertId,
                   user: {
@@ -654,14 +692,14 @@ module.exports = {
                 });
 
               case 6:
-                isExistAlert = _context9.sent;
+                isExistAlert = _context10.sent;
 
                 if (!isExistAlert) {
-                  _context9.next = 13;
+                  _context10.next = 13;
                   break;
                 }
 
-                _context9.next = 10;
+                _context10.next = 10;
                 return prisma.deleteAlert({
                   where: {
                     id: alertId
@@ -669,20 +707,20 @@ module.exports = {
                 });
 
               case 10:
-                return _context9.abrupt("return", true);
+                return _context10.abrupt("return", true);
 
               case 13:
-                return _context9.abrupt("return", false);
+                return _context10.abrupt("return", false);
 
               case 14:
               case "end":
-                return _context9.stop();
+                return _context10.stop();
             }
           }
-        }, _callee9);
+        }, _callee10);
       }));
 
-      function readAlert(_x25, _x26, _x27) {
+      function readAlert(_x28, _x29, _x30) {
         return _readAlert.apply(this, arguments);
       }
 
@@ -692,8 +730,8 @@ module.exports = {
   Subscription: {
     // 메세지 갱신
     syncMessage: {
-      subscribe: function subscribe(_, args, _ref14) {
-        var prisma = _ref14.prisma;
+      subscribe: function subscribe(_, args, _ref15) {
+        var prisma = _ref15.prisma;
         var roomId = args.roomId;
         return prisma.$subscribe.message({
           AND: [{
@@ -707,9 +745,9 @@ module.exports = {
           }]
         }).node();
       },
-      resolve: function resolve(_ref15, _, _ref16) {
-        var id = _ref15.id;
-        var prisma = _ref16.prisma;
+      resolve: function resolve(_ref16, _, _ref17) {
+        var id = _ref16.id;
+        var prisma = _ref17.prisma;
         return prisma.message({
           id: id
         }).$fragment(MESSAGE_FRAGMENT);
@@ -717,92 +755,59 @@ module.exports = {
     }
   },
   // computed
-  User: {
-    // 내가 팔로우 중인 사용자인지 여부
-    isFollowing: function isFollowing(parent, _, _ref17) {
-      var request = _ref17.request,
-          prisma = _ref17.prisma;
-      var id = request.user.id;
-      var parentId = parent.id;
-
-      try {
-        return prisma.$exists.user({
-          AND: [{
-            id: parentId
-          }, {
-            followedBy_some: {
-              id: id
-            }
-          }]
-        });
-      } catch (_unused3) {
-        return false;
-      }
-    },
+  User: {// 내가 팔로우 중인 사용자인지 여부
+    // isFollowing: (parent, _, { request, prisma }) => {
+    //   const {
+    //     user: { id }
+    //   } = request;
+    //   const { id: parentId } = parent;
+    //   try {
+    //     return prisma.$exists.user({
+    //       AND: [{ id: parentId }, { followedBy_some: { id } }]
+    //     });
+    //   } catch {
+    //     return false;
+    //   }
+    // },
     // 내정보인지 여부
-    isMe: function isMe(parent, _, _ref18) {
-      var request = _ref18.request;
-      var id = request.user.id;
-      var parentId = parent.id;
-      return id === parentId;
-    }
+    // isMe: (parent, _, { request }) => {
+    //   const {
+    //     user: { id }
+    //   } = request;
+    //   const { id: parentId } = parent;
+    //   return id === parentId;
+    // }
   },
-  MessageRoom: {
-    // 최근 내 메세지
-    recentMyMessage: function () {
-      var _recentMyMessage = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee10(parent, _, _ref19) {
-        var request, prisma, id, parentId, filterOptions, isExistMessage;
-        return _regenerator["default"].wrap(function _callee10$(_context10) {
-          while (1) {
-            switch (_context10.prev = _context10.next) {
-              case 0:
-                request = _ref19.request, prisma = _ref19.prisma;
-                id = request.user.id;
-                parentId = parent.id;
-                filterOptions = {
-                  AND: [{
-                    room: {
-                      id: parentId
-                    }
-                  }, {
-                    from: {
-                      id: id
-                    }
-                  }]
-                };
-                _context10.next = 6;
-                return prisma.$exist.message(filterOptions);
-
-              case 6:
-                isExistMessage = _context10.sent;
-
-                if (!isExistMessage) {
-                  _context10.next = 11;
-                  break;
-                }
-
-                return _context10.abrupt("return", prisma.messages({
-                  where: filterOptions,
-                  first: 1,
-                  orderBy: "updatedAt_DESC"
-                }));
-
-              case 11:
-                return _context10.abrupt("return", null);
-
-              case 12:
-              case "end":
-                return _context10.stop();
-            }
-          }
-        }, _callee10);
-      }));
-
-      function recentMyMessage(_x28, _x29, _x30) {
-        return _recentMyMessage.apply(this, arguments);
-      }
-
-      return recentMyMessage;
-    }()
+  MessageRoom: {// 최근 내 메세지
+    // recentMyMessage: async (parent, _, { request, prisma }) => {
+    //   const {
+    //     user: { id }
+    //   } = request;
+    //   const { id: parentId } = parent;
+    //   const filterOptions = {
+    //     AND: [
+    //       {
+    //         room: {
+    //           id: parentId
+    //         }
+    //       },
+    //       {
+    //         from: {
+    //           id
+    //         }
+    //       }
+    //     ]
+    //   };
+    //   const isExistMessage = await prisma.$exist.message(filterOptions);
+    //   if (isExistMessage) {
+    //     return prisma.messages({
+    //       where: filterOptions,
+    //       first: 1,
+    //       orderBy: "updatedAt_DESC"
+    //     });
+    //   } else {
+    //     return null;
+    //   }
+    // }
   }
 };

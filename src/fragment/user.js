@@ -31,6 +31,19 @@ exports.USER_FRAGMENT = `
   }
 `;
 
+exports.LOGIN_FRAGMENT = `
+  fragment LoginParts on User {
+    id
+    pwd
+    nickname 
+    email
+    isMaster
+    avatar {
+      url
+    }
+  }
+`;
+
 exports.MESSAGEROOM_FRAGMENT = `
   fragment MessageRoomParts on MessageRoom {
     id

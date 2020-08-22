@@ -16,72 +16,46 @@ module.exports = {
     // 포스트 검색
     getPosts: function () {
       var _getPosts = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(_, args, _ref) {
-        var request, isAuthenticated, prisma, id, _args$skip, skip, _args$first, first, _args$orderBy, orderBy, searchKeyword, orFilter, from, to, isExistSearchKeyword, where;
+        var prisma, _args$skip, skip, _args$first, first, _args$orderBy, orderBy, searchKeyword, orFilter, where;
 
         return _regenerator["default"].wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                request = _ref.request, isAuthenticated = _ref.isAuthenticated, prisma = _ref.prisma;
-                isAuthenticated({
-                  request: request
-                });
-                id = request.user.id;
+                prisma = _ref.prisma;
                 _args$skip = args.skip, skip = _args$skip === void 0 ? 0 : _args$skip, _args$first = args.first, first = _args$first === void 0 ? 30 : _args$first, _args$orderBy = args.orderBy, orderBy = _args$orderBy === void 0 ? "createdAt_DESC" : _args$orderBy, searchKeyword = args.searchKeyword;
                 orFilter = [];
 
-                if (!searchKeyword) {
-                  _context.next = 18;
-                  break;
+                if (searchKeyword) {
+                  orFilter.push({
+                    title_contains: searchKeyword
+                  });
+                  orFilter.push({
+                    description_contains: searchKeyword
+                  }); // const from = moment();
+                  // from.set({ hour: 0, minute: 0, second: 0 });
+                  // const to = moment();
+                  // to.set({ hour: 23, minute: 59, second: 59 });
+                  // const isExistSearchKeyword = await prisma.$exists.searchKeyword({
+                  //   user: {
+                  //     id
+                  //   },
+                  //   keyword: searchKeyword,
+                  //   createdAt_gt: from,
+                  //   createdAt_lt: to
+                  // });
+                  // if (!isExistSearchKeyword) {
+                  //   await prisma.createSearchKeyword({
+                  //     keyword: searchKeyword,
+                  //     user: {
+                  //       connect: {
+                  //         id
+                  //       }
+                  //     }
+                  //   });
+                  // }
                 }
 
-                orFilter.push({
-                  title_contains: searchKeyword
-                });
-                orFilter.push({
-                  description_contains: searchKeyword
-                });
-                from = moment();
-                from.set({
-                  hour: 0,
-                  minute: 0,
-                  second: 0
-                });
-                to = moment();
-                to.set({
-                  hour: 23,
-                  minute: 59,
-                  second: 59
-                });
-                _context.next = 14;
-                return prisma.$exists.searchKeyword({
-                  user: {
-                    id: id
-                  },
-                  keyword: searchKeyword,
-                  createdAt_gt: from,
-                  createdAt_lt: to
-                });
-
-              case 14:
-                isExistSearchKeyword = _context.sent;
-
-                if (isExistSearchKeyword) {
-                  _context.next = 18;
-                  break;
-                }
-
-                _context.next = 18;
-                return prisma.createSearchKeyword({
-                  keyword: searchKeyword,
-                  user: {
-                    connect: {
-                      id: id
-                    }
-                  }
-                });
-
-              case 18:
                 where = orFilter.length > 0 ? {
                   OR: orFilter // video: {
                   //   status: "complete"
@@ -95,7 +69,7 @@ module.exports = {
                   orderBy: orderBy
                 }).$fragment(POST_FRAGMENT));
 
-              case 20:
+              case 6:
               case "end":
                 return _context.stop();
             }
@@ -413,39 +387,30 @@ module.exports = {
     }()
   },
   // computed
-  Post: {
-    // 내가 좋아요 했는지 여부
-    isLiked: function isLiked(_ref8, _, _ref9) {
-      var id = _ref8.id;
-      var user = _ref9.request.user,
-          prisma = _ref9.prisma;
-      return prisma.$exists.like({
-        AND: [{
-          user: {
-            id: user.id
-          },
-          post: {
-            id: id
-          }
-        }]
-      });
-    },
+  Post: {// 내가 좋아요 했는지 여부
+    // isLiked: ({ id }, _, { request: { user }, prisma }) => {
+    //   return prisma.$exists.like({
+    //     AND: [
+    //       {
+    //         user: {
+    //           id: user.id
+    //         },
+    //         post: {
+    //           id
+    //         }
+    //       }
+    //     ]
+    //   });
+    // },
     // 포스트의 좋아요 수
-    likeCount: function likeCount(parent, _, _ref10) {
-      var prisma = _ref10.prisma;
-      return prisma.likesConnection({
-        where: {
-          post: {
-            id: parent.id
-          }
-        }
-      }).aggregate().count();
-    },
+    // likeCount: (parent, _, { prisma }) => {
+    //   return prisma
+    //     .likesConnection({ where: { post: { id: parent.id } } })
+    //     .aggregate()
+    //     .count();
+    // },
     // 내가 작성한 포스트 여부
-    isMyPost: function isMyPost(parent, _, _ref11) {
-      var user = _ref11.request.user,
-          prisma = _ref11.prisma;
-      return parent.user.id === user.id;
-    }
+    // isMyPost: (parent, _, { request: { user }, prisma }) =>
+    //   parent.user.id === user.id
   }
 };

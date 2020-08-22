@@ -1,5 +1,10 @@
 type Query {
-  getNotices(skip: Int, first: Int, orderBy: String): [Notice!]!
+  getNotices(
+    skip: Int
+    first: Int
+    orderBy: String
+    searchKeyword: String
+  ): [Notice!]!
 
   getNotice(noticeId: String!): Notice!
 }

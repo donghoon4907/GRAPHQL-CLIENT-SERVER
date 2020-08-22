@@ -14,21 +14,36 @@ module.exports = {
     // 공지 검색
     getNotices: function () {
       var _getNotices = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(_, args, _ref) {
-        var prisma, _args$skip, skip, _args$first, first, _args$orderBy, orderBy;
+        var prisma, _args$skip, skip, _args$first, first, _args$orderBy, orderBy, searchKeyword, orFilter, where;
 
         return _regenerator["default"].wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 prisma = _ref.prisma;
-                _args$skip = args.skip, skip = _args$skip === void 0 ? 0 : _args$skip, _args$first = args.first, first = _args$first === void 0 ? 30 : _args$first, _args$orderBy = args.orderBy, orderBy = _args$orderBy === void 0 ? "createdAt_DESC" : _args$orderBy;
+                _args$skip = args.skip, skip = _args$skip === void 0 ? 0 : _args$skip, _args$first = args.first, first = _args$first === void 0 ? 30 : _args$first, _args$orderBy = args.orderBy, orderBy = _args$orderBy === void 0 ? "createdAt_DESC" : _args$orderBy, searchKeyword = args.searchKeyword;
+                orFilter = [];
+
+                if (searchKeyword) {
+                  orFilter.push({
+                    title_contains: searchKeyword
+                  });
+                  orFilter.push({
+                    description_contains: searchKeyword
+                  });
+                }
+
+                where = orFilter.length > 0 ? {
+                  OR: orFilter
+                } : {};
                 return _context.abrupt("return", prisma.notices({
                   first: first,
                   skip: skip,
-                  orderBy: orderBy
+                  orderBy: orderBy,
+                  where: where
                 }).$fragment(NOTICE_FRAGMENT));
 
-              case 3:
+              case 6:
               case "end":
                 return _context.stop();
             }

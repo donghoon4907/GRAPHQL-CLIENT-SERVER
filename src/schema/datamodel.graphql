@@ -15,8 +15,6 @@ type User {
   followedBy: [User!]!
   following: [User!]!
   rooms: [MessageRoom!]!
-  isFollowing: Boolean!
-  isMe: Boolean!
   isMaster: Boolean!
 }
 
@@ -30,9 +28,6 @@ type Post {
   createdAt: String!
   updatedAt: String!
   status: String!
-  isLiked: Boolean!
-  likeCount: Int!
-  isMyPost: Boolean!
   room: MessageRoom!
 }
 
@@ -105,4 +100,13 @@ type File {
   filename: String!
   mimetype: String!
   encoding: String!
+}
+
+type Login {
+  token: String!
+  id: String!
+  email: String!
+  nickname: String!
+  avatar: Image!
+  isMaster: Boolean!
 }

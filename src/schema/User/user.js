@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const generateToken = require("../../module/token");
 const {
   USER_FRAGMENT,
+  LOGIN_FRAGMENT,
   MESSAGEROOM_FRAGMENT,
   MESSAGE_FRAGMENT
 } = require("../../fragment/user");
@@ -25,6 +26,15 @@ module.exports = {
           skip,
           where,
           orderBy
+        })
+        .$fragment(USER_FRAGMENT);
+    },
+    // 추천 사용자 검색
+    getRecommandUsers: async (_, __, { prisma }) => {
+      return prisma
+        .users({
+          first: 3,
+          orderBy: "createdAt_DESC"
         })
         .$fragment(USER_FRAGMENT);
     },
@@ -201,13 +211,21 @@ module.exports = {
     logIn: async (_, args, { prisma }) => {
       const { email, pwd } = args;
 
-      const user = await prisma.user({ email });
+      const user = await prisma.user({ email }).$fragment(LOGIN_FRAGMENT);
 
       if (user) {
         const isCheckPwd = await bcrypt.compare(pwd, user.pwd);
 
         if (isCheckPwd) {
-          return generateToken({ id: user.id });
+          const { id, nickname, email, avatar, isMaster } = user;
+          return {
+            token: generateToken({ id: user.id }),
+            id,
+            nickname,
+            email,
+            avatar,
+            isMaster
+          };
         } else {
           throw Error(
             JSON.stringify({
@@ -380,61 +398,59 @@ module.exports = {
   // computed
   User: {
     // 내가 팔로우 중인 사용자인지 여부
-    isFollowing: (parent, _, { request, prisma }) => {
-      const {
-        user: { id }
-      } = request;
-      const { id: parentId } = parent;
-
-      try {
-        return prisma.$exists.user({
-          AND: [{ id: parentId }, { followedBy_some: { id } }]
-        });
-      } catch {
-        return false;
-      }
-    },
+    // isFollowing: (parent, _, { request, prisma }) => {
+    //   const {
+    //     user: { id }
+    //   } = request;
+    //   const { id: parentId } = parent;
+    //   try {
+    //     return prisma.$exists.user({
+    //       AND: [{ id: parentId }, { followedBy_some: { id } }]
+    //     });
+    //   } catch {
+    //     return false;
+    //   }
+    // },
     // 내정보인지 여부
-    isMe: (parent, _, { request }) => {
-      const {
-        user: { id }
-      } = request;
-      const { id: parentId } = parent;
-      return id === parentId;
-    }
+    // isMe: (parent, _, { request }) => {
+    //   const {
+    //     user: { id }
+    //   } = request;
+    //   const { id: parentId } = parent;
+    //   return id === parentId;
+    // }
   },
   MessageRoom: {
     // 최근 내 메세지
-    recentMyMessage: async (parent, _, { request, prisma }) => {
-      const {
-        user: { id }
-      } = request;
-      const { id: parentId } = parent;
-
-      const filterOptions = {
-        AND: [
-          {
-            room: {
-              id: parentId
-            }
-          },
-          {
-            from: {
-              id
-            }
-          }
-        ]
-      };
-      const isExistMessage = await prisma.$exist.message(filterOptions);
-      if (isExistMessage) {
-        return prisma.messages({
-          where: filterOptions,
-          first: 1,
-          orderBy: "updatedAt_DESC"
-        });
-      } else {
-        return null;
-      }
-    }
+    // recentMyMessage: async (parent, _, { request, prisma }) => {
+    //   const {
+    //     user: { id }
+    //   } = request;
+    //   const { id: parentId } = parent;
+    //   const filterOptions = {
+    //     AND: [
+    //       {
+    //         room: {
+    //           id: parentId
+    //         }
+    //       },
+    //       {
+    //         from: {
+    //           id
+    //         }
+    //       }
+    //     ]
+    //   };
+    //   const isExistMessage = await prisma.$exist.message(filterOptions);
+    //   if (isExistMessage) {
+    //     return prisma.messages({
+    //       where: filterOptions,
+    //       first: 1,
+    //       orderBy: "updatedAt_DESC"
+    //     });
+    //   } else {
+    //     return null;
+    //   }
+    // }
   }
 };

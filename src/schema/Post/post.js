@@ -4,12 +4,7 @@ const moment = require("moment");
 module.exports = {
   Query: {
     // 포스트 검색
-    getPosts: async (_, args, { request, isAuthenticated, prisma }) => {
-      isAuthenticated({ request });
-      const {
-        user: { id }
-      } = request;
-
+    getPosts: async (_, args, { prisma }) => {
       const {
         skip = 0,
         first = 30,
@@ -23,30 +18,30 @@ module.exports = {
         orFilter.push({ title_contains: searchKeyword });
         orFilter.push({ description_contains: searchKeyword });
 
-        const from = moment();
-        from.set({ hour: 0, minute: 0, second: 0 });
-        const to = moment();
-        to.set({ hour: 23, minute: 59, second: 59 });
+        // const from = moment();
+        // from.set({ hour: 0, minute: 0, second: 0 });
+        // const to = moment();
+        // to.set({ hour: 23, minute: 59, second: 59 });
 
-        const isExistSearchKeyword = await prisma.$exists.searchKeyword({
-          user: {
-            id
-          },
-          keyword: searchKeyword,
-          createdAt_gt: from,
-          createdAt_lt: to
-        });
+        // const isExistSearchKeyword = await prisma.$exists.searchKeyword({
+        //   user: {
+        //     id
+        //   },
+        //   keyword: searchKeyword,
+        //   createdAt_gt: from,
+        //   createdAt_lt: to
+        // });
 
-        if (!isExistSearchKeyword) {
-          await prisma.createSearchKeyword({
-            keyword: searchKeyword,
-            user: {
-              connect: {
-                id
-              }
-            }
-          });
-        }
+        // if (!isExistSearchKeyword) {
+        //   await prisma.createSearchKeyword({
+        //     keyword: searchKeyword,
+        //     user: {
+        //       connect: {
+        //         id
+        //       }
+        //     }
+        //   });
+        // }
       }
       const where =
         orFilter.length > 0
@@ -219,29 +214,29 @@ module.exports = {
   // computed
   Post: {
     // 내가 좋아요 했는지 여부
-    isLiked: ({ id }, _, { request: { user }, prisma }) => {
-      return prisma.$exists.like({
-        AND: [
-          {
-            user: {
-              id: user.id
-            },
-            post: {
-              id
-            }
-          }
-        ]
-      });
-    },
+    // isLiked: ({ id }, _, { request: { user }, prisma }) => {
+    //   return prisma.$exists.like({
+    //     AND: [
+    //       {
+    //         user: {
+    //           id: user.id
+    //         },
+    //         post: {
+    //           id
+    //         }
+    //       }
+    //     ]
+    //   });
+    // },
     // 포스트의 좋아요 수
-    likeCount: (parent, _, { prisma }) => {
-      return prisma
-        .likesConnection({ where: { post: { id: parent.id } } })
-        .aggregate()
-        .count();
-    },
+    // likeCount: (parent, _, { prisma }) => {
+    //   return prisma
+    //     .likesConnection({ where: { post: { id: parent.id } } })
+    //     .aggregate()
+    //     .count();
+    // },
     // 내가 작성한 포스트 여부
-    isMyPost: (parent, _, { request: { user }, prisma }) =>
-      parent.user.id === user.id
+    // isMyPost: (parent, _, { request: { user }, prisma }) =>
+    //   parent.user.id === user.id
   }
 };

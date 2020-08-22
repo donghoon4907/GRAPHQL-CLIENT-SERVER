@@ -4,13 +4,33 @@ module.exports = {
   Query: {
     // 공지 검색
     getNotices: async (_, args, { prisma }) => {
-      const { skip = 0, first = 30, orderBy = "createdAt_DESC" } = args;
+      const {
+        skip = 0,
+        first = 30,
+        orderBy = "createdAt_DESC",
+        searchKeyword
+      } = args;
+
+      const orFilter = [];
+
+      if (searchKeyword) {
+        orFilter.push({ title_contains: searchKeyword });
+        orFilter.push({ description_contains: searchKeyword });
+      }
+
+      const where =
+        orFilter.length > 0
+          ? {
+              OR: orFilter
+            }
+          : {};
 
       return prisma
         .notices({
           first,
           skip,
-          orderBy
+          orderBy,
+          where
         })
         .$fragment(NOTICE_FRAGMENT);
     },
