@@ -11,39 +11,33 @@ var _require = require("../../fragment/notice"),
 
 module.exports = {
   Query: {
-    // 공지 검색
-    getNotices: function () {
-      var _getNotices = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(_, args, _ref) {
-        var prisma, _args$skip, skip, _args$first, first, _args$orderBy, orderBy, searchKeyword, orFilter, where;
+    /**
+     * * 공지사항 검색
+     *
+     * @query
+     * @author frisk
+     * @param {number?} args.skip 건너뛸 목록의 수
+     * @param {number?} args.first 요청 목록의 수
+     * @param {string?} args.orderBy 정렬
+     * @returns Notice[]
+     */
+    notices: function () {
+      var _notices = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(_, args, _ref) {
+        var prisma, _args$skip, skip, _args$first, first, _args$orderBy, orderBy;
 
         return _regenerator["default"].wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 prisma = _ref.prisma;
-                _args$skip = args.skip, skip = _args$skip === void 0 ? 0 : _args$skip, _args$first = args.first, first = _args$first === void 0 ? 30 : _args$first, _args$orderBy = args.orderBy, orderBy = _args$orderBy === void 0 ? "createdAt_DESC" : _args$orderBy, searchKeyword = args.searchKeyword;
-                orFilter = [];
-
-                if (searchKeyword) {
-                  orFilter.push({
-                    title_contains: searchKeyword
-                  });
-                  orFilter.push({
-                    description_contains: searchKeyword
-                  });
-                }
-
-                where = orFilter.length > 0 ? {
-                  OR: orFilter
-                } : {};
+                _args$skip = args.skip, skip = _args$skip === void 0 ? 0 : _args$skip, _args$first = args.first, first = _args$first === void 0 ? 30 : _args$first, _args$orderBy = args.orderBy, orderBy = _args$orderBy === void 0 ? "createdAt_DESC" : _args$orderBy;
                 return _context.abrupt("return", prisma.notices({
                   first: first,
                   skip: skip,
-                  orderBy: orderBy,
-                  where: where
+                  orderBy: orderBy
                 }).$fragment(NOTICE_FRAGMENT));
 
-              case 6:
+              case 3:
               case "end":
                 return _context.stop();
             }
@@ -51,31 +45,51 @@ module.exports = {
         }, _callee);
       }));
 
-      function getNotices(_x, _x2, _x3) {
-        return _getNotices.apply(this, arguments);
+      function notices(_x, _x2, _x3) {
+        return _notices.apply(this, arguments);
       }
 
-      return getNotices;
+      return notices;
     }(),
-    // 공지 상세 정보
-    getNotice: function getNotice(_, args, _ref2) {
+
+    /**
+     * * 공지사항 상세 조회
+     *
+     * @query
+     * @author frisk
+     * @param {string} args.id 공지사항 ID
+     * @returns Notice
+     */
+    notice: function notice(_, args, _ref2) {
       var prisma = _ref2.prisma;
-      var noticeId = args.noticeId;
+      var id = args.id;
       return prisma.notice({
-        id: noticeId
+        id: id
       });
     }
   },
   Mutation: {
-    // 공지 추가
-    addNotice: function () {
-      var _addNotice = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(_, args, _ref3) {
+    /**
+     * * 공지사항 등록
+     *
+     * @mutation
+     * @author frisk
+     * @param {string} args.title 제목
+     * @param {string} args.description 내용
+     * @returns boolean
+     */
+    createNotice: function () {
+      var _createNotice = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(_, args, _ref3) {
         var request, isAuthenticated, prisma, title, description;
         return _regenerator["default"].wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 request = _ref3.request, isAuthenticated = _ref3.isAuthenticated, prisma = _ref3.prisma;
+
+                /**
+                 * 인증 확인
+                 */
                 isAuthenticated({
                   request: request
                 });
@@ -97,42 +111,67 @@ module.exports = {
         }, _callee2);
       }));
 
-      function addNotice(_x4, _x5, _x6) {
-        return _addNotice.apply(this, arguments);
+      function createNotice(_x4, _x5, _x6) {
+        return _createNotice.apply(this, arguments);
       }
 
-      return addNotice;
+      return createNotice;
     }(),
-    // 공지 수정
+
+    /**
+     * * 공지사항 수정
+     *
+     * @mutation
+     * @author frisk
+     * @param {string} args.id 공지사항 ID
+     * @param {string} args.title 제목
+     * @param {string} args.description 내용
+     * @returns boolean
+     */
     updateNotice: function () {
       var _updateNotice = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(_, args, _ref4) {
-        var request, isAuthenticated, prisma, noticeId, title, description, isExistNotice;
+        var request, isAuthenticated, prisma, id, title, description, isExistNotice;
         return _regenerator["default"].wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
                 request = _ref4.request, isAuthenticated = _ref4.isAuthenticated, prisma = _ref4.prisma;
+
+                /**
+                 * 인증 확인
+                 */
                 isAuthenticated({
                   request: request
                 });
-                noticeId = args.noticeId, title = args.title, description = args.description;
+                id = args.id, title = args.title, description = args.description;
+                /**
+                 * 공지사항 유무 확인
+                 * @type {boolean}
+                 */
+
                 _context3.next = 5;
                 return prisma.$exists.notice({
-                  id: noticeId
+                  id: id
                 });
 
               case 5:
                 isExistNotice = _context3.sent;
 
-                if (!isExistNotice) {
-                  _context3.next = 12;
+                if (isExistNotice) {
+                  _context3.next = 8;
                   break;
                 }
 
-                _context3.next = 9;
+                throw Error(JSON.stringify({
+                  message: "존재하지 않는 공지사항입니다.",
+                  status: 403
+                }));
+
+              case 8:
+                _context3.next = 10;
                 return prisma.updateNotice({
                   where: {
-                    id: noticeId
+                    id: id
                   },
                   data: {
                     title: title,
@@ -140,13 +179,10 @@ module.exports = {
                   }
                 });
 
-              case 9:
+              case 10:
                 return _context3.abrupt("return", true);
 
-              case 12:
-                return _context3.abrupt("return", false);
-
-              case 13:
+              case 11:
               case "end":
                 return _context3.stop();
             }
@@ -160,44 +196,64 @@ module.exports = {
 
       return updateNotice;
     }(),
-    // 공지 삭제
+
+    /**
+     * * 공지사항 삭제
+     *
+     * @mutation
+     * @author frisk
+     * @param {string} args.id 공지사항 ID
+     * @returns boolean
+     */
     deleteNotice: function () {
       var _deleteNotice = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(_, args, _ref5) {
-        var request, isAuthenticated, prisma, noticeId, isExistNotice;
+        var request, isAuthenticated, prisma, id, isExistNotice;
         return _regenerator["default"].wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
                 request = _ref5.request, isAuthenticated = _ref5.isAuthenticated, prisma = _ref5.prisma;
+
+                /**
+                 * 인증 확인
+                 */
                 isAuthenticated({
                   request: request
                 });
-                noticeId = args.noticeId;
+                id = args.id;
+                /**
+                 * 공지사항 유무 확인
+                 * @type {boolean}
+                 */
+
                 _context4.next = 5;
                 return prisma.$exists.notice({
-                  id: noticeId
+                  id: id
                 });
 
               case 5:
                 isExistNotice = _context4.sent;
 
-                if (!isExistNotice) {
-                  _context4.next = 12;
+                if (isExistNotice) {
+                  _context4.next = 8;
                   break;
                 }
 
-                _context4.next = 9;
+                throw Error(JSON.stringify({
+                  message: "존재하지 않는 공지사항입니다.",
+                  status: 403
+                }));
+
+              case 8:
+                _context4.next = 10;
                 return prisma.deleteNotice({
-                  id: noticeId
+                  id: id
                 });
 
-              case 9:
+              case 10:
                 return _context4.abrupt("return", true);
 
-              case 12:
-                return _context4.abrupt("return", false);
-
-              case 13:
+              case 11:
               case "end":
                 return _context4.stop();
             }

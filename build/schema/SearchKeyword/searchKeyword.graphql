@@ -1,8 +1,0 @@
-type Query {
-  getSearchKeyword(
-    skip: Int
-    first: Int
-    orderBy: String
-    searchKeyword: String!
-  ): [SearchKeyword!]!
-}

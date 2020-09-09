@@ -1,112 +1,54 @@
-scalar Upload
-
+# 사용자
 type User {
   id: ID!
-  nickname: String!
-  firstname: String!
-  lastname: String!
-  pwd: String!
-  email: String!
-  createdAt: String!
-  updatedAt: String!
-  avatar: Image
-  posts: [Post!]!
-  likes: [Like!]!
-  followedBy: [User!]!
-  following: [User!]!
-  rooms: [MessageRoom!]!
-  isMaster: Boolean!
+  nickname: String! # 별칭
+  email: String! # 이메일
+  isMaster: Boolean! # 운영자 여부
+  createdAt: String! # 등록일
+  updatedAt: String! # 수정일
+  avatar: Avatar # 프로필 사진
+  posts: [Post!]! # 내가 쓴 포스트 목록
+  likes: [Like!]! # 내가 좋아요한 포스트
+  postCount: Int! # 내가 작성한 포스트 수
+  token: String # 인증 토큰
 }
-
+# 게시물
 type Post {
   id: ID!
-  title: String!
-  description: String
-  video: Video!
-  user: User!
-  likes: [Like!]!
-  createdAt: String!
-  updatedAt: String!
-  status: String!
-  room: MessageRoom!
+  title: String! # 제목
+  description: String! # 내용
+  user: User! # 등록자
+  likeCount: Int! # 좋아요 수
+  likes: [Like!]! # 좋아요한 사용자 목록
+  createdAt: String! # 등록일
+  updatedAt: String! # 수정일
+  isTemp: Boolean! # 임시저장 여부
+  viewCount: Int! # 조회수
+  categories: [Category!]! # 카테고리 목록
 }
-
+# 공지사항
+type Notice {
+  id: ID!
+  title: String! # 제목
+  description: String! # 내용
+  createdAt: String! # 등록일
+  updatedAt: String! # 수정일
+}
+# 좋아요
 type Like {
   id: ID!
   user: User!
   post: Post!
 }
-
-type Image {
+# 카테고리
+type Category {
   id: ID!
-  url: String!
-  user: User
-  post: Post
+  post: Post!
+  content: String! # 카테고리명
+  useCount: Int! # 사용수
 }
-
-type Video {
+# 프로필 사진
+type Avatar {
   id: ID!
-  url: String!
-  url_240p: String
-  url_320p: String
-  url_480p: String
-  url_720p: String
-  url_1080p: String
-  status: String
-}
-
-type MessageRoom {
-  id: ID!
-  participants: [User!]!
-  messages: [Message!]!
-  recentMyMessage: Message
-  createdAt: String!
-  updatedAt: String!
-  post: Post
-}
-
-type Message {
-  id: ID!
-  content: String!
-  from: User!
-  to: User
-  room: MessageRoom!
-  createdAt: String!
-  updatedAt: String!
-}
-
-type Alert {
-  id: ID!
-  user: User!
-  content: String!
-}
-
-type Notice {
-  id: ID!
-  title: String!
-  description: String!
-  createdAt: String!
-  updatedAt: String!
-}
-
-type SearchKeyword {
-  id: ID!
-  keyword: String!
-  createdAt: String!
-  user: User!
-}
-
-type File {
-  filename: String!
-  mimetype: String!
-  encoding: String!
-}
-
-type Login {
-  token: String!
-  id: String!
-  email: String!
-  nickname: String!
-  avatar: Image!
-  isMaster: Boolean!
+  url: String! # 파일 URL
 }
