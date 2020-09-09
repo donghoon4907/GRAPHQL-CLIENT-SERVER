@@ -2,78 +2,27 @@ type User {
   id: ID! @id
   nickname: String! @unique
   email: String! @unique
-  pwd: String! 
   isMaster: Boolean! @default(value: false)
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
-  avatar: Image @relation(name: "AvartarOfUser", link: INLINE)
+  avatar: Avatar! @relation(link: INLINE)
   posts: [Post!]! @relation(name: "PostOfUser", onDelete: CASCADE)
   likes: [Like!]! @relation(name: "LikeOfUser", onDelete: CASCADE)
-  followedBy: [User!]! @relation(name: "UserFollows", references: [id])
-  following: [User!]! @relation(name: "UserFollows", references: [id])
-  rooms: [MessageRoom!]! @relation(name: "MessageRoomOfUser")
-  alerts: [Alert!]! @relation(name: "AlertOfUser", onDelete: CASCADE)
+  postCount: Int! @default(value: 0)
 }
 
 type Post {
   id: ID! @id
-  title: String! @length(max: 200)
-  description: String @length(max: 500)
-  video: Video!
+  title: String! 
+  description: String!
   user: User! @relation(name: "PostOfUser")
+  likeCount: Int! @default(value: 0)
   likes: [Like!]! @relation(name: "LikeOfPost", onDelete: CASCADE)
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
-  status: PostStatus!
-  room: MessageRoom @relation(name: "PostOfMessageRoom", link: INLINE)
-}
-
-type Like {
-  id: ID! @id
-  user: User! @relation(name: "LikeOfUser")
-  post: Post! @relation(name: "LikeOfPost")
-}
-
-type Image {
-  id: ID! @id
-  url: String!
-  user: User @relation(name: "AvartarOfUser")
-}
-
-type Video {
-  id: ID! @id
-  url: String!
-  url_240p: String
-  url_320p: String
-  url_480p: String
-  url_720p: String
-  url_1080p: String
-  status: String
-}
-
-type MessageRoom {
-  id: ID! @id 
-  participants: [User!]! @relation(name: "MessageRoomOfUser")
-  messages: [Message!]! @relation(name: "MessageOfRoom")
-  createdAt: DateTime! @createdAt
-  updatedAt: DateTime! @updatedAt
-  post: Post @relation(name: "PostOfMessageRoom")
-}
-
-type Message {
-  id: ID! @id 
-  content: String! 
-  from: User! @relation(name: "From")
-  to: User @relation(name: "To")
-  room: MessageRoom! @relation(name: "MessageOfRoom", onDelete: CASCADE)
-  createdAt: DateTime! @createdAt
-  updatedAt: DateTime! @updatedAt
-}
-
-type Alert {
-  id: ID! @id
-  user: User! @relation(name: "AlertOfUser")
-  content: String! 
+  isTemp: Boolean! @default(value: false)
+  viewCount: Int! @default(value: 0)
+  categories: [Category!]! @relation(name: "CategoryOfPost")
 }
 
 type Notice {
@@ -84,15 +33,25 @@ type Notice {
   updatedAt: DateTime! @updatedAt
 }
 
-type SearchKeyword {
+type Like {
   id: ID! @id
-  keyword: String!
-  createdAt: DateTime! @createdAt
-  user: User!
+  user: User! @relation(name: "LikeOfUser")
+  post: Post! @relation(name: "LikeOfPost")
 }
 
-enum PostStatus {
-  PUBLIC
-  PRIVATE
+type Category {
+  id: ID! @id
+  post: Post! @relation(name: "CategoryOfPost")
+  content: String! 
+  useCount: Int! @default(value: 0)
 }
+
+type Avatar {
+  id: ID! @id
+  url: String!
+}
+
+
+
+
 

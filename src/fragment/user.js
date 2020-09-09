@@ -1,90 +1,27 @@
-exports.USER_FRAGMENT = `
-  fragment UserParts on User {
+exports.USERS_FRAGMENT = `
+  fragment UsersParts on User {
     id
     nickname 
     email
     isMaster
-    avatar {
-      url
-    }
-    followedBy {
-      id
-      nickname
-      email
-    }
-    following {
-      id
-      nickname
-      email
-    }
-    posts {
-      id
-      title 
-      description
-      likes {
-        id
-      }
-    }
-    rooms {
-      id
-    }
-  }
-`;
-
-exports.LOGIN_FRAGMENT = `
-  fragment LoginParts on User {
-    id
-    pwd
-    nickname 
-    email
-    isMaster
-    avatar {
-      url
-    }
-  }
-`;
-
-exports.MESSAGEROOM_FRAGMENT = `
-  fragment MessageRoomParts on MessageRoom {
-    id
-    participants {
-      id
-      nickname
-      email 
-      avatar {
-        url
-      }
-    }
-    messages {
-      id
-      content
-      createdAt
-      updatedAt
-      from {
-        id
-        nickname
-        email 
-        avatar {
-          url
-        }
-      }
-    }
-  }
-`;
-
-exports.MESSAGE_FRAGMENT = `
-  fragment MessageParts on Message {
-    id
-    content
     createdAt
     updatedAt
-    from {
-      id
-      nickname
-      email 
-      avatar {
-        url
-      }
+    avatar {
+      url
+    }
+  }
+`;
+
+exports.MY_FRAGMENT = `
+  fragment myParts on User {
+    id
+    nickname 
+    email
+    isMaster
+    createdAt
+    updatedAt
+    avatar {
+      url
     }
   }
 `;

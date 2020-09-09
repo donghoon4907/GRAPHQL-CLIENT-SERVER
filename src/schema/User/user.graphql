@@ -1,42 +1,15 @@
 type Query {
-  getUsers(skip: Int, first: Int, orderBy: String, nickname: String): [User!]!
+  users(skip: Int, first: Int, orderBy: String): [User!]!
 
-  getRecommandUsers: [User!]!
+  user(id: String!): User!
 
-  getUser(userId: String!): User!
-
-  getMyProfile: User!
-
-  getMessageRooms(skip: Int, first: Int): [MessageRoom!]!
-
-  getMessageRoom(roomId: String!): MessageRoom!
+  me: User!
 }
 
 type Mutation {
-  addUser(
-    email: String!
-    pwd: String!
-    nickname: String!
-    file: String!
-  ): Boolean!
+  createUser(email: String!, nickname: String!, file: String!): Boolean!
 
-  updateUser(nickname: String, pwd: String, file: String): User!
+  updateUser(nickname: String, file: String): Boolean!
 
-  requestSecret(email: String!): String!
-
-  confirmSecret(email: String!, secret: String!): String!
-
-  logIn(email: String!, pwd: String!): Login!
-
-  follow(userId: String!): Boolean!
-
-  unfollow(userId: String!): Boolean!
-
-  addMessage(content: String!, roomId: String, to: String): Boolean!
-
-  readAlert(alertId: String!): Boolean!
-}
-
-type Subscription {
-  syncMessage(roomId: String!): Message
+  logIn(email: String!): User!
 }

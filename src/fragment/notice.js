@@ -1,5 +1,5 @@
 exports.NOTICE_FRAGMENT = `
-  fragment NoticeParts on Notice {
+  fragment NoticesParts on Notice {
     id
     title
     description

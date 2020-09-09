@@ -1,55 +1,43 @@
-const { POST_FRAGMENT } = require("../../fragment/post");
-const moment = require("moment");
+const { POSTS_FRAGMENT, POST_FRAGMENT } = require("../../fragment/post");
 
 module.exports = {
   Query: {
-    // 포스트 검색
-    getPosts: async (_, args, { prisma }) => {
-      const {
-        skip = 0,
-        first = 30,
-        orderBy = "createdAt_DESC",
-        searchKeyword
-      } = args;
+    /**
+     * * 게시물 검색
+     *
+     * @query
+     * @author frisk
+     * @param {number?} args.skip 건너뛸 목록의 수
+     * @param {number?} args.first 요청 목록의 수
+     * @param {string?} args.orderBy 정렬
+     * @param {string?} args.query 검색어
+     * @returns Post[]
+     */
+    posts: async (_, args, { prisma }) => {
+      const { skip = 0, first = 30, orderBy = "createdAt_DESC", query } = args;
 
+      /**
+       * 필터 목록
+       * @type {Array<object>}
+       */
       const orFilter = [];
 
-      if (searchKeyword) {
-        orFilter.push({ title_contains: searchKeyword });
-        orFilter.push({ description_contains: searchKeyword });
-
-        // const from = moment();
-        // from.set({ hour: 0, minute: 0, second: 0 });
-        // const to = moment();
-        // to.set({ hour: 23, minute: 59, second: 59 });
-
-        // const isExistSearchKeyword = await prisma.$exists.searchKeyword({
-        //   user: {
-        //     id
-        //   },
-        //   keyword: searchKeyword,
-        //   createdAt_gt: from,
-        //   createdAt_lt: to
-        // });
-
-        // if (!isExistSearchKeyword) {
-        //   await prisma.createSearchKeyword({
-        //     keyword: searchKeyword,
-        //     user: {
-        //       connect: {
-        //         id
-        //       }
-        //     }
-        //   });
-        // }
+      if (query) {
+        /**
+         * 제목 및 내용 like 조건 추가
+         */
+        orFilter.push({ title_contains: query });
+        orFilter.push({ description_contains: query });
       }
+
       const where =
         orFilter.length > 0
           ? {
-              OR: orFilter
-              // video: {
-              //   status: "complete"
-              // }
+              OR: orFilter,
+              /**
+               * 임시저장이 아닌 게시물 대상
+               */
+              isTemp: false
             }
           : {};
 
@@ -60,149 +48,246 @@ module.exports = {
           where,
           orderBy
         })
-        .$fragment(POST_FRAGMENT);
+        .$fragment(POSTS_FRAGMENT);
     },
-    // 포스트 상세 정보
-    getPost: (_, args, { prisma }) => {
-      const { postId } = args;
+    /**
+     * * 게시물 상세 조회
+     *
+     * @query
+     * @author frisk
+     * @param {string} args.id 게시물 ID
+     * @returns Post
+     */
+    post: (_, args, { prisma }) => {
+      const { id } = args;
 
-      return prisma.post({ id: postId }).$fragment(POST_FRAGMENT);
-    },
-    // 피드 검색
-    getFeed: async (_, args, { request, isAuthenticated, prisma }) => {
-      isAuthenticated({ request });
-      const { skip = 0, first = 30, orderBy = "createdAt_DESC" } = args;
-      const {
-        user: { id }
-      } = request;
-      const following = await prisma.user({ id }).following();
-
-      return prisma
-        .posts({
-          where: {
-            user: {
-              id_in: following.map(user => user.id)
-            }
-          },
-          first,
-          skip,
-          orderBy
-        })
-        .$fragment(POST_FRAGMENT);
+      return prisma.post({ id }).$fragment(POST_FRAGMENT);
     }
   },
   Mutation: {
-    // 포스트 추가
-    addPost: async (_, args, { request, isAuthenticated, prisma }) => {
+    /**
+     * * 게시물 등록
+     *
+     * @mutation
+     * @author frisk
+     * @param {string} args.title 제목
+     * @param {string} args.description 내용
+     * @param {string[]} categories 카테고리 목록
+     * @returns boolean
+     */
+    createPost: async (_, args, { request, isAuthenticated, prisma }) => {
+      /**
+       * 인증 확인
+       */
       isAuthenticated({ request });
-      const { title, description, status, file } = args;
+
       const {
         user: { id }
       } = request;
+
+      const { title, description, categories } = args;
+
+      /**
+       * 카테고리 매핑
+       * @type {object}
+       */
+      const mapToCategories = {
+        /**
+         * 생성 목록: 새로운 카테고리
+         */
+        create: [],
+        /**
+         * 연결 목록: 기존 카테고리
+         */
+        connect: []
+      };
+
+      for (let i = 0; i < categories.length; i++) {
+        const content = categories[i];
+
+        /**
+         * 카테고리 중복 확인
+         * @type {Category|null}
+         */
+        const findCategory = await prisma.category({ content });
+
+        if (findCategory) {
+          /**
+           * 연결 목록에 추가
+           */
+          mapToCategories.connect.push({
+            id: findCategory.id
+          });
+          /**
+           * 카테고리 사용수 + 1
+           */
+          await prisma.updateCategory({
+            data: {
+              useCount: findCategory.useCount + 1
+            },
+            where: {
+              id: findCategory.id
+            }
+          });
+        } else {
+          /**
+           * 생성 목록에 추가
+           */
+          mapToCategories.create.push({
+            content
+          });
+        }
+      }
 
       await prisma.createPost({
         title,
         description,
-        status,
+        categories: mapToCategories,
         user: {
           connect: { id }
-        },
-        video: {
-          create: {
-            url: file,
-            status: "queue"
-          }
-        },
-        room: {
-          create: {
-            participants: {
-              connect: {
-                id
-              }
-            }
-          }
         }
       });
+
       return true;
     },
-    // 포스트 수정
+    /**
+     * * 게시물 수정
+     *
+     * @mutation
+     * @author frisk
+     * @param {string} args.id 게시물 ID
+     * @param {string} args.title 제목
+     * @param {string} args.description 내용
+     * @returns boolean
+     */
     updatePost: async (_, args, { request, isAuthenticated, prisma }) => {
+      /**
+       * 인증 확인
+       */
       isAuthenticated({ request });
-      const { postId, title, description, status } = args;
 
-      const isExistPost = await prisma.$exists.post({
-        id: postId
+      const { id, title, description } = args;
+
+      /**
+       * 게시물 유무 확인
+       * @type {boolean}
+       */
+      const isExistPost = await prisma.$exists.post({ id });
+
+      if (!isExistPost) {
+        throw Error(
+          JSON.stringify({
+            message: "존재하지 않는 게시물입니다.",
+            status: 403
+          })
+        );
+      }
+
+      await prisma.updatePost({
+        where: { id },
+        data: {
+          title,
+          description
+        }
       });
 
-      if (isExistPost) {
-        await prisma.updatePost({
-          where: { id: postId },
-          data: {
-            title,
-            description,
-            status
-          }
-        });
-        return true;
-      } else {
-        return false;
-      }
+      return true;
     },
-    // 포스트 삭제
+    /**
+     * * 게시물 삭제
+     *
+     * @mutation
+     * @author frisk
+     * @param {string} args.id 게시물 ID
+     * @returns boolean
+     */
     deletePost: async (_, args, { request, isAuthenticated, prisma }) => {
+      /**
+       * 인증 확인
+       */
       isAuthenticated({ request });
-      const { postId } = args;
 
-      const isExistPost = await prisma.$exists.post({
-        id: postId
-      });
+      const { id } = args;
 
-      if (isExistPost) {
-        await prisma.deletePost({ id: postId });
-        return true;
-      } else {
-        return false;
+      /**
+       * 게시물 유무 확인
+       * @type {boolean}
+       */
+      const isExistPost = await prisma.$exists.post({ id });
+
+      if (!isExistPost) {
+        throw Error(
+          JSON.stringify({
+            message: "존재하지 않는 게시물입니다.",
+            status: 403
+          })
+        );
       }
-    },
-    // 포스트 좋아요 / 취소
-    likePost: async (_, args, { request, isAuthenticated, prisma }) => {
-      isAuthenticated({ request });
-      const { postId } = args;
-      const {
-        user: { id }
-      } = request;
 
-      const filterOptions = {
+      await prisma.deletePost({ id });
+
+      return true;
+    },
+    /**
+     * * 게시물 좋아요 / 좋아요 취소
+     *
+     * @mutation
+     * @author frisk
+     * @param {string} args.id 게시물 ID
+     * @returns boolean
+     */
+    likePost: async (_, args, { request, isAuthenticated, prisma }) => {
+      /**
+       * 인증 확인
+       */
+      isAuthenticated({ request });
+
+      const { user } = request;
+
+      const { id } = args;
+
+      /**
+       * 좋아요 요청 공통 옵션
+       * @type {object}
+       */
+      const options = {
         AND: [
           {
             user: {
-              id
+              id: user.id
             }
           },
           {
             post: {
-              id: postId
+              id
             }
           }
         ]
       };
-      // 특정 포스트의 좋아요 유무 판별
-      const isExistLike = await prisma.$exists.like(filterOptions);
+
+      /**
+       * 좋아요 유무 판별
+       */
+      const isExistLike = await prisma.$exists.like(options);
 
       if (isExistLike) {
-        // unlike
-        await prisma.deleteManyLikes(filterOptions);
+        /**
+         * 좋아요 취소
+         */
+        await prisma.deleteManyLikes(options);
       } else {
-        // like
+        /**
+         * 좋아요
+         */
         await prisma.createLike({
           user: {
             connect: {
-              id
+              id: user.id
             }
           },
           post: {
             connect: {
-              id: postId
+              id
             }
           }
         });
@@ -210,33 +295,5 @@ module.exports = {
 
       return true;
     }
-  },
-  // computed
-  Post: {
-    // 내가 좋아요 했는지 여부
-    // isLiked: ({ id }, _, { request: { user }, prisma }) => {
-    //   return prisma.$exists.like({
-    //     AND: [
-    //       {
-    //         user: {
-    //           id: user.id
-    //         },
-    //         post: {
-    //           id
-    //         }
-    //       }
-    //     ]
-    //   });
-    // },
-    // 포스트의 좋아요 수
-    // likeCount: (parent, _, { prisma }) => {
-    //   return prisma
-    //     .likesConnection({ where: { post: { id: parent.id } } })
-    //     .aggregate()
-    //     .count();
-    // },
-    // 내가 작성한 포스트 여부
-    // isMyPost: (parent, _, { request: { user }, prisma }) =>
-    //   parent.user.id === user.id
   }
 };
