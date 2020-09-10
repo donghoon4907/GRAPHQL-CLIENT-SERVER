@@ -17,7 +17,6 @@ var _require2 = require("../../generated/prisma-client"),
 
 var jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  // 헤더에서 jwt를 찾음
   secretOrKey: process.env.JWT_SECRET
 };
 

@@ -103,6 +103,9 @@ module.exports = {
         );
       }
 
+      /**
+       * 사용자 추가
+       */
       await prisma.createUser({
         email,
         nickname,
@@ -193,6 +196,9 @@ module.exports = {
         }
       }
 
+      /**
+       * 사용자 수정
+       */
       await prisma.updateUser({
         where: { id },
         data

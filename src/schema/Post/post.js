@@ -58,8 +58,69 @@ module.exports = {
      * @param {string} args.id 게시물 ID
      * @returns Post
      */
-    post: (_, args, { prisma }) => {
+    post: async (_, args, { prisma }) => {
       const { id } = args;
+
+      /**
+       * 게시물 중복 확인
+       * @type {Post|null}
+       */
+      const findPost = await prisma.post({ id });
+
+      if (findPost) {
+        /**
+         * 사용자의 IP
+         */
+        const ip =
+          req.headers["x-forwarded-for"] ||
+          req.connection.remoteAddress ||
+          req.socket.remoteAddress ||
+          req.connection.socket.remoteAddress;
+
+        /**
+         * 오늘 범위값 설정
+         */
+        const from = moment();
+        from.set({ hour: 0, minute: 0, second: 0 });
+        const to = moment();
+        to.set({ hour: 23, minute: 59, second: 59 });
+
+        /**
+         * 접근 내역 확인
+         * @type {boolean}
+         */
+        const isExistHistory = await prisma.$exists.history({
+          ip,
+          createdAt_gt: from,
+          createdAt_lt: to
+        });
+
+        if (!isExistHistory) {
+          /**
+           * 접근 내역 추가
+           */
+          await prisma.createHistory({
+            ip,
+            post: {
+              connect: {
+                id
+              }
+            }
+          });
+
+          /**
+           * 조회수 증가
+           */
+          await prisma.updatePost({
+            where: {
+              id
+            },
+            data: {
+              viewCount: findPost.viewCount + 1
+            }
+          });
+        }
+      }
 
       return prisma.post({ id }).$fragment(POST_FRAGMENT);
     }
@@ -72,6 +133,7 @@ module.exports = {
      * @author frisk
      * @param {string} args.title 제목
      * @param {string} args.description 내용
+     * @param {string} args.isTemp 임시저장 여부
      * @param {string[]} categories 카테고리 목록
      * @returns boolean
      */
@@ -88,22 +150,18 @@ module.exports = {
       const { title, description, categories } = args;
 
       /**
-       * 카테고리 매핑
-       * @type {object}
+       * 게시물 추가
        */
-      const mapToCategories = {
-        /**
-         * 생성 목록: 새로운 카테고리
-         */
-        create: [],
-        /**
-         * 연결 목록: 기존 카테고리
-         */
-        connect: []
-      };
+      const newPost = await prisma.createPost({
+        title,
+        description,
+        user: {
+          connect: { id }
+        }
+      });
 
       for (let i = 0; i < categories.length; i++) {
-        const content = categories[i];
+        const content = categories[i].content;
 
         /**
          * 카테고리 중복 확인
@@ -113,40 +171,55 @@ module.exports = {
 
         if (findCategory) {
           /**
-           * 연결 목록에 추가
-           */
-          mapToCategories.connect.push({
-            id: findCategory.id
-          });
-          /**
            * 카테고리 사용수 + 1
            */
           await prisma.updateCategory({
             data: {
-              useCount: findCategory.useCount + 1
+              useCount: findCategory.useCount + 1,
+              post: {
+                connect: {
+                  id: newPost.id
+                }
+              }
             },
             where: {
-              id: findCategory.id
+              content
             }
           });
         } else {
           /**
-           * 생성 목록에 추가
+           * 카테고리 생성
            */
-          mapToCategories.create.push({
-            content
+          await prisma.createCategory({
+            data: {
+              content,
+              post: {
+                connect: {
+                  id: newPost.id
+                }
+              }
+            }
           });
         }
       }
 
-      await prisma.createPost({
-        title,
-        description,
-        categories: mapToCategories,
-        user: {
-          connect: { id }
-        }
-      });
+      /**
+       * 사용자 조회
+       * @type {User|null}
+       */
+      const findUser = await prisma.user({ id });
+
+      if (findUser) {
+        /**
+         * 사용자 포스트 수 증가
+         */
+        await prisma.updateUser({
+          where: { id },
+          data: {
+            postCount: findUser.postCount + 1
+          }
+        });
+      }
 
       return true;
     },
@@ -207,6 +280,8 @@ module.exports = {
        */
       isAuthenticated({ request });
 
+      const { user } = request;
+
       const { id } = args;
 
       /**
@@ -225,6 +300,24 @@ module.exports = {
       }
 
       await prisma.deletePost({ id });
+
+      /**
+       * 사용자 조회
+       * @type {User|null}
+       */
+      const findUser = await prisma.user({ id: user.id });
+
+      if (findUser) {
+        /**
+         * 사용자 포스트 수 감소
+         */
+        await prisma.updateUser({
+          where: { id: user.id },
+          data: {
+            postCount: findUser.postCount - 1
+          }
+        });
+      }
 
       return true;
     },
@@ -266,7 +359,23 @@ module.exports = {
       };
 
       /**
+       * 게시물 유무 확인
+       * @type {boolean}
+       */
+      const findPost = await prisma.post({ id });
+
+      if (!findPost) {
+        throw Error(
+          JSON.stringify({
+            message: "존재하지 않는 게시물입니다.",
+            status: 403
+          })
+        );
+      }
+
+      /**
        * 좋아요 유무 판별
+       * @type {boolean}
        */
       const isExistLike = await prisma.$exists.like(options);
 
@@ -275,6 +384,16 @@ module.exports = {
          * 좋아요 취소
          */
         await prisma.deleteManyLikes(options);
+
+        /**
+         * 게시물 좋아요 수 감소
+         */
+        await prisma.updatePost({
+          where: { id },
+          data: {
+            likeCount: findPost.likeCount - 1
+          }
+        });
       } else {
         /**
          * 좋아요
@@ -289,6 +408,16 @@ module.exports = {
             connect: {
               id
             }
+          }
+        });
+
+        /**
+         * 게시물 좋아요 수 증가
+         */
+        await prisma.updatePost({
+          where: { id },
+          data: {
+            likeCount: findPost.likeCount + 1
           }
         });
       }

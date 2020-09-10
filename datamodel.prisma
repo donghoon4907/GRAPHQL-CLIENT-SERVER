@@ -8,6 +8,7 @@ type User {
   avatar: Avatar! @relation(link: INLINE)
   posts: [Post!]! @relation(name: "PostOfUser", onDelete: CASCADE)
   likes: [Like!]! @relation(name: "LikeOfUser", onDelete: CASCADE)
+  comments: [Comment!]! @relation(name: "CommentOfUser", onDelete: CASCADE)
   postCount: Int! @default(value: 0)
 }
 
@@ -23,6 +24,8 @@ type Post {
   isTemp: Boolean! @default(value: false)
   viewCount: Int! @default(value: 0)
   categories: [Category!]! @relation(name: "CategoryOfPost")
+  comments: [Comment!]! @relation(name: "CommentOfPost", onDelete: CASCADE)
+  commentCount: Int! @default(value: 0)
 }
 
 type Notice {
@@ -41,9 +44,25 @@ type Like {
 
 type Category {
   id: ID! @id
-  post: Post! @relation(name: "CategoryOfPost")
-  content: String! 
+  post: [Post!]! @relation(name: "CategoryOfPost")
+  content: String! @unique
   useCount: Int! @default(value: 0)
+}
+
+type Comment {
+  id: ID! @id
+  post: Post! @relation(name: "CommentOfPost")
+  user: User! @relation(name: "CommentOfUser")
+  content: String!
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+}
+
+type History {
+  id: ID! @id 
+  post: Post!
+  ip: String!
+  createdAt: DateTime! @createdAt
 }
 
 type Avatar {

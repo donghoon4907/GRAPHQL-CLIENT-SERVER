@@ -77,6 +77,7 @@ module.exports = {
        * 인증 확인
        */
       isAuthenticated({ request });
+
       const { id, title, description } = args;
 
       /**

@@ -288,6 +288,10 @@ module.exports = {
                     };
                   }
                 }
+                /**
+                 * 사용자 수정
+                 */
+
 
                 _context3.next = 21;
                 return prisma.updateUser({

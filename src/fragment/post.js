@@ -23,6 +23,7 @@ exports.POSTS_FRAGMENT = `
     categories {
       content
     }
+    commentCount
   }
 `;
 
@@ -50,7 +51,22 @@ exports.POST_FRAGMENT = `
     isTemp
     viewCount
     categories {
+      id
       content
+    }
+    commentCount
+    comments {
+      id
+      content
+      createdAt
+      updatedAt
+      user {
+        id
+        nickname
+        avatar {
+          url
+        }
+      }
     }
   }
 `;

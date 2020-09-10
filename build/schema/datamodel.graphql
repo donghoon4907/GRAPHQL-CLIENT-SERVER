@@ -8,7 +8,8 @@ type User {
   updatedAt: String! # 수정일
   avatar: Avatar # 프로필 사진
   posts: [Post!]! # 내가 쓴 포스트 목록
-  likes: [Like!]! # 내가 좋아요한 포스트
+  likes: [Like!]! # 내가 좋아요한 포스트 목록
+  comments: [Comment!]! # 내가 작성한 댓글 목록
   postCount: Int! # 내가 작성한 포스트 수
   token: String # 인증 토큰
 }
@@ -25,6 +26,8 @@ type Post {
   isTemp: Boolean! # 임시저장 여부
   viewCount: Int! # 조회수
   categories: [Category!]! # 카테고리 목록
+  comments: [Comment!]! # 댓글 목록
+  commentCount: Int! # 댓글수
 }
 # 공지사항
 type Notice {
@@ -43,9 +46,25 @@ type Like {
 # 카테고리
 type Category {
   id: ID!
-  post: Post!
+  post: [Post!]!
   content: String! # 카테고리명
   useCount: Int! # 사용수
+}
+# 댓글
+type Comment {
+  id: ID!
+  post: Post!
+  user: User!
+  content: String! # 내용
+  createdAt: String! # 등록일
+  updatedAt: String! # 수정일
+}
+# 조회 내역
+type History {
+  id: ID!
+  post: Post!
+  ip: String!
+  createdAt: String! # 생성일
 }
 # 프로필 사진
 type Avatar {

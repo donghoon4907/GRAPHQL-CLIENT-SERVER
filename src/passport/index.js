@@ -3,7 +3,7 @@ const { Strategy, ExtractJwt } = require("passport-jwt");
 const { prisma } = require("../../generated/prisma-client");
 
 const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // 헤더에서 jwt를 찾음
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: process.env.JWT_SECRET
 };
 
