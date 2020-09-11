@@ -17,7 +17,8 @@ type User {
 type Post {
   id: ID!
   title: String! # 제목
-  description: String! # 내용
+  description: String! # 소개
+  content: String! # 내용
   user: User! # 등록자
   likeCount: Int! # 좋아요 수
   likes: [Like!]! # 좋아요한 사용자 목록

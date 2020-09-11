@@ -22,6 +22,7 @@ exports.POSTS_FRAGMENT = `
     viewCount
     categories {
       content
+      useCount
     }
     commentCount
   }

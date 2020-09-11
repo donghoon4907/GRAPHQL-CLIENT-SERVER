@@ -212,7 +212,7 @@ module.exports = {
      */
     createPost: function () {
       var _createPost = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(_, args, _ref3) {
-        var request, isAuthenticated, prisma, id, title, description, categories, newPost, i, content, findCategory, findUser;
+        var request, isAuthenticated, prisma, id, title, description, content, categories, newPost, i, category, findCategory, findUser;
         return _regenerator["default"].wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -226,7 +226,7 @@ module.exports = {
                   request: request
                 });
                 id = request.user.id;
-                title = args.title, description = args.description, categories = args.categories;
+                title = args.title, description = args.description, content = args.content, categories = args.categories;
                 /**
                  * 게시물 추가
                  */
@@ -235,6 +235,7 @@ module.exports = {
                 return prisma.createPost({
                   title: title,
                   description: description,
+                  content: content,
                   user: {
                     connect: {
                       id: id
@@ -252,7 +253,7 @@ module.exports = {
                   break;
                 }
 
-                content = categories[i].content;
+                category = categories[i].content;
                 /**
                  * 카테고리 중복 확인
                  * @type {Category|null}
@@ -260,7 +261,7 @@ module.exports = {
 
                 _context3.next = 12;
                 return prisma.category({
-                  content: content
+                  content: category
                 });
 
               case 12:
@@ -282,7 +283,7 @@ module.exports = {
                     }
                   },
                   where: {
-                    content: content
+                    content: category
                   }
                 });
 
@@ -293,12 +294,10 @@ module.exports = {
               case 18:
                 _context3.next = 20;
                 return prisma.createCategory({
-                  data: {
-                    content: content,
-                    post: {
-                      connect: {
-                        id: newPost.id
-                      }
+                  content: category,
+                  post: {
+                    connect: {
+                      id: newPost.id
                     }
                   }
                 });

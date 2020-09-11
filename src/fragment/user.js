@@ -15,6 +15,7 @@ exports.USERS_FRAGMENT = `
 exports.MY_FRAGMENT = `
   fragment myParts on User {
     id
+    email
     nickname 
     isMaster
     createdAt

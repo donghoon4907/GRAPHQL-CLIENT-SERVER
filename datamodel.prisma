@@ -16,6 +16,7 @@ type Post {
   id: ID! @id
   title: String! 
   description: String!
+  content: String!
   user: User! @relation(name: "PostOfUser")
   likeCount: Int! @default(value: 0)
   likes: [Like!]! @relation(name: "LikeOfPost", onDelete: CASCADE)

@@ -147,7 +147,7 @@ module.exports = {
         user: { id }
       } = request;
 
-      const { title, description, categories } = args;
+      const { title, description, content, categories } = args;
 
       /**
        * 게시물 추가
@@ -155,19 +155,19 @@ module.exports = {
       const newPost = await prisma.createPost({
         title,
         description,
+        content,
         user: {
           connect: { id }
         }
       });
 
       for (let i = 0; i < categories.length; i++) {
-        const content = categories[i].content;
-
+        const category = categories[i].content;
         /**
          * 카테고리 중복 확인
          * @type {Category|null}
          */
-        const findCategory = await prisma.category({ content });
+        const findCategory = await prisma.category({ content: category });
 
         if (findCategory) {
           /**
@@ -183,7 +183,7 @@ module.exports = {
               }
             },
             where: {
-              content
+              content: category
             }
           });
         } else {
@@ -191,12 +191,10 @@ module.exports = {
            * 카테고리 생성
            */
           await prisma.createCategory({
-            data: {
-              content,
-              post: {
-                connect: {
-                  id: newPost.id
-                }
+            content: category,
+            post: {
+              connect: {
+                id: newPost.id
               }
             }
           });
