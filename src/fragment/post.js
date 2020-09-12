@@ -20,10 +20,7 @@ exports.POSTS_FRAGMENT = `
     createdAt
     updatedAt 
     viewCount
-    categories {
-      content
-      useCount
-    }
+    category
     commentCount
   }
 `;
@@ -33,6 +30,7 @@ exports.POST_FRAGMENT = `
     id
     title 
     description
+    content
     user {
       id
       nickname
@@ -49,25 +47,7 @@ exports.POST_FRAGMENT = `
     }
     createdAt
     updatedAt 
-    isTemp
     viewCount
-    categories {
-      id
-      content
-    }
-    commentCount
-    comments {
-      id
-      content
-      createdAt
-      updatedAt
-      user {
-        id
-        nickname
-        avatar {
-          url
-        }
-      }
-    }
+    category
   }
 `;

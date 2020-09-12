@@ -1,4 +1,4 @@
-exports.isAuthenticated = ({ request: { user } }) => {
+exports.isAuthenticated = async ({ request: { user } }) => {
   if (!user) {
     throw Error(
       JSON.stringify({

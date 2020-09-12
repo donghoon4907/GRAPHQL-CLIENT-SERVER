@@ -26,7 +26,7 @@ type Post {
   updatedAt: String! # 수정일
   isTemp: Boolean! # 임시저장 여부
   viewCount: Int! # 조회수
-  categories: [Category!]! # 카테고리 목록
+  category: Category! # 카테고리
   comments: [Comment!]! # 댓글 목록
   commentCount: Int! # 댓글수
 }

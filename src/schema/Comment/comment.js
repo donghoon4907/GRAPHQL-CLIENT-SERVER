@@ -1,4 +1,64 @@
+const {
+  COMMENTS_FRAGMENT,
+  COMMENT_FRAGMENT
+} = require("../../fragment/comment");
+
 module.exports = {
+  Query: {
+    /**
+     * * 댓글 검색
+     *
+     * @query
+     * @author frisk
+     * @param {number?} args.skip 건너뛸 목록의 수
+     * @param {number?} args.first 요청 목록의 수
+     * @param {string?} args.orderBy 정렬
+     * @param {string?} args.postId 게시물 ID
+     */
+    comments: async (_, args, { prisma }) => {
+      const { skip = 0, first = 30, orderBy = "createdAt_DESC", postId } = args;
+      /**
+       * 필터 목록
+       * @type {Array<object>}
+       */
+      const orFilter = [];
+
+      if (postId) {
+        /**
+         * 특정 게시물 조건 추가
+         */
+        orFilter.push({ post: { id: postId } });
+      }
+
+      const where =
+        orFilter.length > 0
+          ? {
+              OR: orFilter
+            }
+          : {};
+
+      const comments = await prisma
+        .comments({
+          where,
+          first,
+          skip,
+          orderBy
+        })
+        .$fragment(COMMENTS_FRAGMENT);
+
+      const total = await prisma
+        .commentsConnection({
+          where
+        })
+        .aggregate()
+        .count();
+
+      return {
+        data: comments,
+        total
+      };
+    }
+  },
   Mutation: {
     /**
      * * 댓글 등록
@@ -14,6 +74,10 @@ module.exports = {
        * 인증 확인
        */
       isAuthenticated({ request });
+
+      const {
+        user: { id }
+      } = request;
 
       const { postId, content } = args;
 
@@ -40,6 +104,11 @@ module.exports = {
         post: {
           connect: {
             id: postId
+          }
+        },
+        user: {
+          connect: {
+            id
           }
         }
       });
@@ -110,7 +179,7 @@ module.exports = {
      * @param {string} args.id 댓글 ID
      * @returns boolean
      */
-    deleteNotice: async (_, args, { request, isAuthenticated, prisma }) => {
+    deleteComment: async (_, args, { request, isAuthenticated, prisma }) => {
       /**
        * 인증 확인
        */
@@ -122,7 +191,9 @@ module.exports = {
        * 댓글 유무 확인
        * @type {Comment|null}
        */
-      const findComment = await prisma.comment({ id });
+      const findComment = await prisma
+        .comment({ id })
+        .$fragment(COMMENT_FRAGMENT);
 
       if (!findComment) {
         throw Error(
@@ -139,20 +210,14 @@ module.exports = {
       await prisma.deleteComment({ id });
 
       /**
-       * 댓글의 포스트 정보
-       * @type {Post}
-       */
-      const postOfComment = findComment.post();
-
-      /**
        * 포스트 댓글수 감소
        */
       await prisma.updatePost({
         where: {
-          id: postOfComment.id
+          id: findComment.post.id
         },
         data: {
-          commentCount: postOfComment.commentCount - 1
+          commentCount: findComment.post.commentCount - 1
         }
       });
 

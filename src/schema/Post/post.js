@@ -1,4 +1,5 @@
 const { POSTS_FRAGMENT, POST_FRAGMENT } = require("../../fragment/post");
+const moment = require("moment");
 
 module.exports = {
   Query: {
@@ -33,11 +34,7 @@ module.exports = {
       const where =
         orFilter.length > 0
           ? {
-              OR: orFilter,
-              /**
-               * 임시저장이 아닌 게시물 대상
-               */
-              isTemp: false
+              OR: orFilter
             }
           : {};
 
@@ -58,7 +55,7 @@ module.exports = {
      * @param {string} args.id 게시물 ID
      * @returns Post
      */
-    post: async (_, args, { prisma }) => {
+    post: async (_, args, { request, prisma }) => {
       const { id } = args;
 
       /**
@@ -72,10 +69,10 @@ module.exports = {
          * 사용자의 IP
          */
         const ip =
-          req.headers["x-forwarded-for"] ||
-          req.connection.remoteAddress ||
-          req.socket.remoteAddress ||
-          req.connection.socket.remoteAddress;
+          request.headers["x-forwarded-for"] ||
+          request.connection.remoteAddress ||
+          request.socket.remoteAddress ||
+          request.connection.socket.remoteAddress;
 
         /**
          * 오늘 범위값 설정
@@ -92,7 +89,10 @@ module.exports = {
         const isExistHistory = await prisma.$exists.history({
           ip,
           createdAt_gt: from,
-          createdAt_lt: to
+          createdAt_lt: to,
+          post: {
+            id
+          }
         });
 
         if (!isExistHistory) {
@@ -120,6 +120,13 @@ module.exports = {
             }
           });
         }
+      } else {
+        throw Error(
+          JSON.stringify({
+            message: "존재하지 않는 게시물입니다.",
+            status: 403
+          })
+        );
       }
 
       return prisma.post({ id }).$fragment(POST_FRAGMENT);
@@ -144,80 +151,61 @@ module.exports = {
       isAuthenticated({ request });
 
       const {
-        user: { id }
+        user: { id, postCount }
       } = request;
 
-      const { title, description, content, categories } = args;
+      const { title, description, content, category } = args;
 
       /**
        * 게시물 추가
        */
-      const newPost = await prisma.createPost({
+      await prisma.createPost({
         title,
         description,
         content,
+        category,
         user: {
           connect: { id }
         }
       });
 
-      for (let i = 0; i < categories.length; i++) {
-        const category = categories[i].content;
-        /**
-         * 카테고리 중복 확인
-         * @type {Category|null}
-         */
-        const findCategory = await prisma.category({ content: category });
+      /**
+       * 카테고리 중복 확인
+       * @type {Category|null}
+       */
+      const findCategory = await prisma.category({ content: category });
 
-        if (findCategory) {
-          /**
-           * 카테고리 사용수 + 1
-           */
-          await prisma.updateCategory({
-            data: {
-              useCount: findCategory.useCount + 1,
-              post: {
-                connect: {
-                  id: newPost.id
-                }
-              }
-            },
-            where: {
-              content: category
-            }
-          });
-        } else {
-          /**
-           * 카테고리 생성
-           */
-          await prisma.createCategory({
-            content: category,
-            post: {
-              connect: {
-                id: newPost.id
-              }
-            }
-          });
-        }
+      if (findCategory) {
+        /**
+         * 카테고리 사용수 + 1
+         */
+        await prisma.updateCategory({
+          data: {
+            useCount: findCategory.useCount + 1
+          },
+          where: {
+            content: category
+          }
+        });
+      } else {
+        /**
+         * 카테고리 생성
+         */
+        await prisma.createCategory({
+          content: category,
+          useCount: 1
+        });
       }
 
       /**
-       * 사용자 조회
-       * @type {User|null}
+       * 사용자 포스트 수 증가
        */
-      const findUser = await prisma.user({ id });
-
-      if (findUser) {
-        /**
-         * 사용자 포스트 수 증가
-         */
-        await prisma.updateUser({
-          where: { id },
-          data: {
-            postCount: findUser.postCount + 1
-          }
-        });
-      }
+      await prisma.updateUser({
+        where: { id },
+        data: {
+          postCount: postCount + 1
+        }
+      });
 
       return true;
     },
@@ -237,15 +225,15 @@ module.exports = {
        */
       isAuthenticated({ request });
 
-      const { id, title, description } = args;
+      const { id, title, description, content, category } = args;
 
       /**
        * 게시물 유무 확인
        * @type {boolean}
        */
-      const isExistPost = await prisma.$exists.post({ id });
+      const findPost = await prisma.post({ id });
 
-      if (!isExistPost) {
+      if (!findPost) {
         throw Error(
           JSON.stringify({
             message: "존재하지 않는 게시물입니다.",
@@ -258,9 +246,43 @@ module.exports = {
         where: { id },
         data: {
           title,
-          description
+          description,
+          content,
+          category
         }
       });
+      /**
+       * 기존과 다르게 설정한 경우
+       */
+      if (findPost.category !== category) {
+        /**
+         * 카테고리 중복 확인
+         * @type {Category|null}
+         */
+        const findCategory = await prisma.category({ content: category });
+
+        if (findCategory) {
+          /**
+           * 카테고리 사용수 + 1
+           */
+          await prisma.updateCategory({
+            data: {
+              useCount: findCategory.useCount + 1
+            },
+            where: {
+              content: category
+            }
+          });
+        } else {
+          /**
+           * 카테고리 생성
+           */
+          await prisma.createCategory({
+            content: category,
+            useCount: 1
+          });
+        }
+      }
 
       return true;
     },
@@ -300,22 +322,14 @@ module.exports = {
       await prisma.deletePost({ id });
 
       /**
-       * 사용자 조회
-       * @type {User|null}
+       * 사용자 포스트 수 감소
        */
-      const findUser = await prisma.user({ id: user.id });
-
-      if (findUser) {
-        /**
-         * 사용자 포스트 수 감소
-         */
-        await prisma.updateUser({
-          where: { id: user.id },
-          data: {
-            postCount: findUser.postCount - 1
-          }
-        });
-      }
+      await prisma.updateUser({
+        where: { id: user.id },
+        data: {
+          postCount: user.postCount - 1
+        }
+      });
 
       return true;
     },

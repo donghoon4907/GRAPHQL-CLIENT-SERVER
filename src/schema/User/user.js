@@ -140,21 +140,6 @@ module.exports = {
       const { nickname, file } = args;
 
       /**
-       * 사용자 유무 확인
-       * @type {object|null}
-       */
-      const findMe = await prisma.user({ id });
-
-      if (!findMe) {
-        throw Error(
-          JSON.stringify({
-            message: "존재하지 않는 사용자입니다.",
-            status: 403
-          })
-        );
-      }
-
-      /**
        * 수정할 데이터
        */
       const data = {};

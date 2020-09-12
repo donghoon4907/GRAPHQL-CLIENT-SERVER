@@ -20,11 +20,11 @@ type Post {
   user: User! @relation(name: "PostOfUser")
   likeCount: Int! @default(value: 0)
   likes: [Like!]! @relation(name: "LikeOfPost", onDelete: CASCADE)
+  histories: [History!]! @relation(name: "HistoryOfPost", onDelete: CASCADE)
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
-  isTemp: Boolean! @default(value: false)
   viewCount: Int! @default(value: 0)
-  categories: [Category!]! @relation(name: "CategoryOfPost")
+  category: String!
   comments: [Comment!]! @relation(name: "CommentOfPost", onDelete: CASCADE)
   commentCount: Int! @default(value: 0)
 }
@@ -45,7 +45,6 @@ type Like {
 
 type Category {
   id: ID! @id
-  post: [Post!]! @relation(name: "CategoryOfPost")
   content: String! @unique
   useCount: Int! @default(value: 0)
 }
@@ -61,7 +60,7 @@ type Comment {
 
 type History {
   id: ID! @id 
-  post: Post!
+  post: Post! @relation(name: "HistoryOfPost")
   ip: String!
   createdAt: DateTime! @createdAt
 }
