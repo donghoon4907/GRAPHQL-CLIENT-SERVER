@@ -1,3 +1,13 @@
+# 목록 타입
+type CommentList {
+  data: [Comment!]!
+  total: Int!
+}
+
+type Query {
+  comments(skip: Int, first: Int, orderBy: String, postId: String): CommentList
+}
+
 type Mutation {
   createComment(postId: String!, content: String!): Boolean!
 

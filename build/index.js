@@ -68,7 +68,11 @@ express.post("/api/upload", uploadMiddleware, uploadController);
  */
 
 server.start({
-  port: process.env.PORT || 4000
+  port: process.env.PORT || 4000,
+  bodyParserOptions: {
+    limit: "100mb",
+    type: "application/json"
+  }
 }, function () {
   console.log("Server is running on http://localhost:".concat(process.env.PORT || 4000));
 });

@@ -44,8 +44,14 @@ express.post("/api/upload", uploadMiddleware, uploadController);
 /**
  * GraphQLServer 시작
  */
-server.start({ port: process.env.PORT || 4000 }, () => {
-  console.log(
-    `Server is running on http://localhost:${process.env.PORT || 4000}`
-  );
-});
+server.start(
+  {
+    port: process.env.PORT || 4000,
+    bodyParserOptions: { limit: "100mb", type: "application/json" }
+  },
+  () => {
+    console.log(
+      `Server is running on http://localhost:${process.env.PORT || 4000}`
+    );
+  }
+);

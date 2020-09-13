@@ -10,6 +10,8 @@ var _require = require("../../fragment/post"),
     POSTS_FRAGMENT = _require.POSTS_FRAGMENT,
     POST_FRAGMENT = _require.POST_FRAGMENT;
 
+var moment = require("moment");
+
 module.exports = {
   Query: {
     /**
@@ -25,20 +27,23 @@ module.exports = {
      */
     posts: function () {
       var _posts = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(_, args, _ref) {
-        var prisma, _args$skip, skip, _args$first, first, _args$orderBy, orderBy, query, orFilter, where;
+        var prisma, _args$skip, skip, _args$first, first, _args$orderBy, orderBy, query, category, userId, orFilter, where, posts, total;
 
         return _regenerator["default"].wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 prisma = _ref.prisma;
-                _args$skip = args.skip, skip = _args$skip === void 0 ? 0 : _args$skip, _args$first = args.first, first = _args$first === void 0 ? 30 : _args$first, _args$orderBy = args.orderBy, orderBy = _args$orderBy === void 0 ? "createdAt_DESC" : _args$orderBy, query = args.query;
+                _args$skip = args.skip, skip = _args$skip === void 0 ? 0 : _args$skip, _args$first = args.first, first = _args$first === void 0 ? 30 : _args$first, _args$orderBy = args.orderBy, orderBy = _args$orderBy === void 0 ? "createdAt_DESC" : _args$orderBy, query = args.query, category = args.category, userId = args.userId;
                 /**
                  * 필터 목록
                  * @type {Array<object>}
                  */
 
                 orFilter = [];
+                /**
+                 * 검색어 조건 추가 시
+                 */
 
                 if (query) {
                   /**
@@ -51,23 +56,59 @@ module.exports = {
                     description_contains: query
                   });
                 }
+                /**
+                 * 카테고리 조건 추가 시
+                 */
+
+
+                if (category) {
+                  orFilter.push({
+                    category: category
+                  });
+                }
+                /**
+                 * 사용자 조건 추가 시
+                 */
+
+
+                if (userId) {
+                  orFilter.push({
+                    user: {
+                      id: userId
+                    }
+                  });
+                }
 
                 where = orFilter.length > 0 ? {
-                  OR: orFilter,
-
-                  /**
-                   * 임시저장이 아닌 게시물 대상
-                   */
-                  isTemp: false
+                  OR: orFilter
                 } : {};
-                return _context.abrupt("return", prisma.posts({
+                /**
+                 * 목록
+                 */
+
+                _context.next = 9;
+                return prisma.posts({
                   first: first,
                   skip: skip,
                   where: where,
                   orderBy: orderBy
-                }).$fragment(POSTS_FRAGMENT));
+                }).$fragment(POSTS_FRAGMENT);
 
-              case 6:
+              case 9:
+                posts = _context.sent;
+                _context.next = 12;
+                return prisma.postsConnection({
+                  where: where
+                }).aggregate().count();
+
+              case 12:
+                total = _context.sent;
+                return _context.abrupt("return", {
+                  data: posts,
+                  total: total
+                });
+
+              case 14:
               case "end":
                 return _context.stop();
             }
@@ -92,12 +133,12 @@ module.exports = {
      */
     post: function () {
       var _post = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(_, args, _ref2) {
-        var prisma, id, findPost, ip, from, to, isExistHistory;
+        var request, prisma, id, findPost, ip, from, to, isExistHistory;
         return _regenerator["default"].wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                prisma = _ref2.prisma;
+                request = _ref2.request, prisma = _ref2.prisma;
                 id = args.id;
                 /**
                  * 게시물 중복 확인
@@ -113,14 +154,14 @@ module.exports = {
                 findPost = _context2.sent;
 
                 if (!findPost) {
-                  _context2.next = 19;
+                  _context2.next = 21;
                   break;
                 }
 
                 /**
                  * 사용자의 IP
                  */
-                ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress;
+                ip = request.headers["x-forwarded-for"] || request.connection.remoteAddress || request.socket.remoteAddress || request.connection.socket.remoteAddress;
                 /**
                  * 오늘 범위값 설정
                  */
@@ -146,7 +187,10 @@ module.exports = {
                 return prisma.$exists.history({
                   ip: ip,
                   createdAt_gt: from,
-                  createdAt_lt: to
+                  createdAt_lt: to,
+                  post: {
+                    id: id
+                  }
                 });
 
               case 13:
@@ -179,11 +223,21 @@ module.exports = {
                 });
 
               case 19:
+                _context2.next = 22;
+                break;
+
+              case 21:
+                throw Error(JSON.stringify({
+                  message: "존재하지 않는 게시물입니다.",
+                  status: 403
+                }));
+
+              case 22:
                 return _context2.abrupt("return", prisma.post({
                   id: id
                 }).$fragment(POST_FRAGMENT));
 
-              case 20:
+              case 23:
               case "end":
                 return _context2.stop();
             }
@@ -212,7 +266,8 @@ module.exports = {
      */
     createPost: function () {
       var _createPost = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(_, args, _ref3) {
-        var request, isAuthenticated, prisma, id, title, description, content, categories, newPost, i, category, findCategory, findUser;
+        var request, isAuthenticated, prisma, _request$user, id, postCount, title, description, content, category, findCategory;
+
         return _regenerator["default"].wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -225,8 +280,8 @@ module.exports = {
                 isAuthenticated({
                   request: request
                 });
-                id = request.user.id;
-                title = args.title, description = args.description, content = args.content, categories = args.categories;
+                _request$user = request.user, id = _request$user.id, postCount = _request$user.postCount;
+                title = args.title, description = args.description, content = args.content, category = args.category;
                 /**
                  * 게시물 추가
                  */
@@ -236,6 +291,7 @@ module.exports = {
                   title: title,
                   description: description,
                   content: content,
+                  category: category,
                   user: {
                     connect: {
                       id: id
@@ -244,97 +300,55 @@ module.exports = {
                 });
 
               case 6:
-                newPost = _context3.sent;
-                i = 0;
-
-              case 8:
-                if (!(i < categories.length)) {
-                  _context3.next = 23;
-                  break;
-                }
-
-                category = categories[i].content;
-                /**
-                 * 카테고리 중복 확인
-                 * @type {Category|null}
-                 */
-
-                _context3.next = 12;
+                _context3.next = 8;
                 return prisma.category({
                   content: category
                 });
 
-              case 12:
+              case 8:
                 findCategory = _context3.sent;
 
                 if (!findCategory) {
-                  _context3.next = 18;
+                  _context3.next = 14;
                   break;
                 }
 
-                _context3.next = 16;
+                _context3.next = 12;
                 return prisma.updateCategory({
                   data: {
-                    useCount: findCategory.useCount + 1,
-                    post: {
-                      connect: {
-                        id: newPost.id
-                      }
-                    }
+                    useCount: findCategory.useCount + 1
                   },
                   where: {
                     content: category
                   }
                 });
 
-              case 16:
-                _context3.next = 20;
+              case 12:
+                _context3.next = 16;
                 break;
 
-              case 18:
-                _context3.next = 20;
+              case 14:
+                _context3.next = 16;
                 return prisma.createCategory({
                   content: category,
-                  post: {
-                    connect: {
-                      id: newPost.id
-                    }
-                  }
+                  useCount: 1
                 });
 
-              case 20:
-                i++;
-                _context3.next = 8;
-                break;
-
-              case 23:
-                _context3.next = 25;
-                return prisma.user({
-                  id: id
-                });
-
-              case 25:
-                findUser = _context3.sent;
-
-                if (!findUser) {
-                  _context3.next = 29;
-                  break;
-                }
-
-                _context3.next = 29;
+              case 16:
+                _context3.next = 18;
                 return prisma.updateUser({
                   where: {
                     id: id
                   },
                   data: {
-                    postCount: findUser.postCount + 1
+                    postCount: postCount + 1
                   }
                 });
 
-              case 29:
+              case 18:
                 return _context3.abrupt("return", true);
 
-              case 30:
+              case 19:
               case "end":
                 return _context3.stop();
             }
@@ -361,7 +375,7 @@ module.exports = {
      */
     updatePost: function () {
       var _updatePost = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(_, args, _ref4) {
-        var request, isAuthenticated, prisma, id, title, description, isExistPost;
+        var request, isAuthenticated, prisma, id, title, description, content, category, findPost, findCategory;
         return _regenerator["default"].wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
@@ -374,21 +388,21 @@ module.exports = {
                 isAuthenticated({
                   request: request
                 });
-                id = args.id, title = args.title, description = args.description;
+                id = args.id, title = args.title, description = args.description, content = args.content, category = args.category;
                 /**
                  * 게시물 유무 확인
                  * @type {boolean}
                  */
 
                 _context4.next = 5;
-                return prisma.$exists.post({
+                return prisma.post({
                   id: id
                 });
 
               case 5:
-                isExistPost = _context4.sent;
+                findPost = _context4.sent;
 
-                if (isExistPost) {
+                if (findPost) {
                   _context4.next = 8;
                   break;
                 }
@@ -406,14 +420,56 @@ module.exports = {
                   },
                   data: {
                     title: title,
-                    description: description
+                    description: description,
+                    content: content,
+                    category: category
                   }
                 });
 
               case 10:
+                if (!(findPost.category !== category)) {
+                  _context4.next = 21;
+                  break;
+                }
+
+                _context4.next = 13;
+                return prisma.category({
+                  content: category
+                });
+
+              case 13:
+                findCategory = _context4.sent;
+
+                if (!findCategory) {
+                  _context4.next = 19;
+                  break;
+                }
+
+                _context4.next = 17;
+                return prisma.updateCategory({
+                  data: {
+                    useCount: findCategory.useCount + 1
+                  },
+                  where: {
+                    content: category
+                  }
+                });
+
+              case 17:
+                _context4.next = 21;
+                break;
+
+              case 19:
+                _context4.next = 21;
+                return prisma.createCategory({
+                  content: category,
+                  useCount: 1
+                });
+
+              case 21:
                 return _context4.abrupt("return", true);
 
-              case 11:
+              case 22:
               case "end":
                 return _context4.stop();
             }
@@ -438,7 +494,7 @@ module.exports = {
      */
     deletePost: function () {
       var _deletePost = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(_, args, _ref5) {
-        var request, isAuthenticated, prisma, user, id, isExistPost, findUser;
+        var request, isAuthenticated, prisma, user, id, isExistPost;
         return _regenerator["default"].wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
@@ -484,32 +540,19 @@ module.exports = {
 
               case 11:
                 _context5.next = 13;
-                return prisma.user({
-                  id: user.id
-                });
-
-              case 13:
-                findUser = _context5.sent;
-
-                if (!findUser) {
-                  _context5.next = 17;
-                  break;
-                }
-
-                _context5.next = 17;
                 return prisma.updateUser({
                   where: {
                     id: user.id
                   },
                   data: {
-                    postCount: findUser.postCount - 1
+                    postCount: user.postCount - 1
                   }
                 });
 
-              case 17:
+              case 13:
                 return _context5.abrupt("return", true);
 
-              case 18:
+              case 14:
               case "end":
                 return _context5.stop();
             }

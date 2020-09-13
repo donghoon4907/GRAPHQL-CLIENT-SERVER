@@ -1,10 +1,18 @@
-input CategoryInput {
-  id: String
-  content: String!
+# 목록 타입
+type PostList {
+  data: [Post!]!
+  total: Int!
 }
 
 type Query {
-  posts(skip: Int, first: Int, orderBy: String, query: String): [Post!]!
+  posts(
+    skip: Int
+    first: Int
+    orderBy: String
+    query: String
+    category: String
+    userId: String
+  ): PostList!
 
   post(id: String!): Post!
 }
@@ -14,7 +22,7 @@ type Mutation {
     title: String
     description: String!
     content: String!
-    categories: [CategoryInput!]!
+    category: String!
   ): Boolean!
 
   updatePost(
@@ -22,6 +30,7 @@ type Mutation {
     title: String!
     description: String!
     content: String!
+    category: String!
   ): Boolean!
 
   deletePost(id: String!): Boolean!

@@ -24,9 +24,8 @@ type Post {
   likes: [Like!]! # 좋아요한 사용자 목록
   createdAt: String! # 등록일
   updatedAt: String! # 수정일
-  isTemp: Boolean! # 임시저장 여부
   viewCount: Int! # 조회수
-  category: Category! # 카테고리
+  category: String! # 카테고리
   comments: [Comment!]! # 댓글 목록
   commentCount: Int! # 댓글수
 }
@@ -47,7 +46,6 @@ type Like {
 # 카테고리
 type Category {
   id: ID!
-  post: [Post!]!
   content: String! # 카테고리명
   useCount: Int! # 사용수
 }

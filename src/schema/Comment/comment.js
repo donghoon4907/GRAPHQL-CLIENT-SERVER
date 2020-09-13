@@ -36,7 +36,9 @@ module.exports = {
               OR: orFilter
             }
           : {};
-
+      /**
+       * 목록
+       */
       const comments = await prisma
         .comments({
           where,
@@ -45,7 +47,9 @@ module.exports = {
           orderBy
         })
         .$fragment(COMMENTS_FRAGMENT);
-
+      /**
+       * 목록 총 갯수
+       */
       const total = await prisma
         .commentsConnection({
           where

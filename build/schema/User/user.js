@@ -10,6 +10,7 @@ var generateToken = require("../../module/token");
 
 var _require = require("../../fragment/user"),
     USERS_FRAGMENT = _require.USERS_FRAGMENT,
+    USER_FRAGMENT = _require.USER_FRAGMENT,
     MY_FRAGMENT = _require.MY_FRAGMENT;
 
 module.exports = {
@@ -70,7 +71,7 @@ module.exports = {
       var id = args.id;
       return prisma.user({
         id: id
-      }).$fragment(USERS_FRAGMENT);
+      }).$fragment(USER_FRAGMENT);
     },
 
     /**
@@ -200,7 +201,7 @@ module.exports = {
      */
     updateUser: function () {
       var _updateUser = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(_, args, _ref5) {
-        var request, isAuthenticated, prisma, id, nickname, file, findMe, data, isExistNickname;
+        var request, isAuthenticated, prisma, id, nickname, file, data, isExistNickname;
         return _regenerator["default"].wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -216,54 +217,31 @@ module.exports = {
                 id = request.user.id;
                 nickname = args.nickname, file = args.file;
                 /**
-                 * 사용자 유무 확인
-                 * @type {object|null}
-                 */
-
-                _context3.next = 6;
-                return prisma.user({
-                  id: id
-                });
-
-              case 6:
-                findMe = _context3.sent;
-
-                if (findMe) {
-                  _context3.next = 9;
-                  break;
-                }
-
-                throw Error(JSON.stringify({
-                  message: "존재하지 않는 사용자입니다.",
-                  status: 403
-                }));
-
-              case 9:
-                /**
                  * 수정할 데이터
                  */
+
                 data = {};
 
                 if (!nickname) {
-                  _context3.next = 18;
+                  _context3.next = 13;
                   break;
                 }
 
                 if (!(nickname !== findMe.nickname)) {
-                  _context3.next = 18;
+                  _context3.next = 13;
                   break;
                 }
 
-                _context3.next = 14;
+                _context3.next = 9;
                 return prisma.$exist.user({
                   nickname: nickname
                 });
 
-              case 14:
+              case 9:
                 isExistNickname = _context3.sent;
 
                 if (!isExistNickname) {
-                  _context3.next = 17;
+                  _context3.next = 12;
                   break;
                 }
 
@@ -272,10 +250,10 @@ module.exports = {
                   status: 403
                 }));
 
-              case 17:
+              case 12:
                 data["nickname"] = nickname;
 
-              case 18:
+              case 13:
                 if (file) {
                   /**
                    * 수정을 원하는 프로필 사진이 현재 설정된 프로필 사진과 다른 경우
@@ -293,7 +271,7 @@ module.exports = {
                  */
 
 
-                _context3.next = 21;
+                _context3.next = 16;
                 return prisma.updateUser({
                   where: {
                     id: id
@@ -301,10 +279,10 @@ module.exports = {
                   data: data
                 });
 
-              case 21:
+              case 16:
                 return _context3.abrupt("return", true);
 
-              case 22:
+              case 17:
               case "end":
                 return _context3.stop();
             }

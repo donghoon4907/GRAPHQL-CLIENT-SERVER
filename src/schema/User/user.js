@@ -1,5 +1,9 @@
 const generateToken = require("../../module/token");
-const { USERS_FRAGMENT, MY_FRAGMENT } = require("../../fragment/user");
+const {
+  USERS_FRAGMENT,
+  USER_FRAGMENT,
+  MY_FRAGMENT
+} = require("../../fragment/user");
 
 module.exports = {
   Query: {
@@ -37,7 +41,7 @@ module.exports = {
     user: (_, args, { prisma }) => {
       const { id } = args;
 
-      return prisma.user({ id }).$fragment(USERS_FRAGMENT);
+      return prisma.user({ id }).$fragment(USER_FRAGMENT);
     },
     /**
      * * 본인 정보 조회

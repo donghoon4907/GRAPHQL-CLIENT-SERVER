@@ -1,5 +1,18 @@
+# 목록 타입
+type PostList {
+  data: [Post!]!
+  total: Int!
+}
+
 type Query {
-  posts(skip: Int, first: Int, orderBy: String, query: String): [Post!]!
+  posts(
+    skip: Int
+    first: Int
+    orderBy: String
+    query: String
+    category: String
+    userId: String
+  ): PostList!
 
   post(id: String!): Post!
 }

@@ -15,20 +15,41 @@ module.exports = {
      * @returns Post[]
      */
     posts: async (_, args, { prisma }) => {
-      const { skip = 0, first = 30, orderBy = "createdAt_DESC", query } = args;
+      const {
+        skip = 0,
+        first = 30,
+        orderBy = "createdAt_DESC",
+        query,
+        category,
+        userId
+      } = args;
 
       /**
        * 필터 목록
        * @type {Array<object>}
        */
       const orFilter = [];
-
+      /**
+       * 검색어 조건 추가 시
+       */
       if (query) {
         /**
          * 제목 및 내용 like 조건 추가
          */
         orFilter.push({ title_contains: query });
         orFilter.push({ description_contains: query });
+      }
+      /**
+       * 카테고리 조건 추가 시
+       */
+      if (category) {
+        orFilter.push({ category });
+      }
+      /**
+       * 사용자 조건 추가 시
+       */
+      if (userId) {
+        orFilter.push({ user: { id: userId } });
       }
 
       const where =
@@ -37,8 +58,10 @@ module.exports = {
               OR: orFilter
             }
           : {};
-
-      return prisma
+      /**
+       * 목록
+       */
+      const posts = await prisma
         .posts({
           first,
           skip,
@@ -46,6 +69,20 @@ module.exports = {
           orderBy
         })
         .$fragment(POSTS_FRAGMENT);
+      /**
+       * 목록 총 갯수
+       */
+      const total = await prisma
+        .postsConnection({
+          where
+        })
+        .aggregate()
+        .count();
+
+      return {
+        data: posts,
+        total
+      };
     },
     /**
      * * 게시물 상세 조회
