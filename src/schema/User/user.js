@@ -209,7 +209,7 @@ module.exports = {
       /**
        * 이메일로 사용자 조회
        */
-      const user = await prisma.user({ email });
+      const user = await prisma.user({ email }).$fragment(MY_FRAGMENT);
 
       if (!user) {
         throw Error(
