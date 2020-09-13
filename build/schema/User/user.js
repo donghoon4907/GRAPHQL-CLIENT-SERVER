@@ -321,7 +321,7 @@ module.exports = {
                 _context4.next = 4;
                 return prisma.user({
                   email: email
-                });
+                }).$fragment(MY_FRAGMENT);
 
               case 4:
                 user = _context4.sent;
