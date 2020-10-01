@@ -112,13 +112,12 @@ module.exports = {
             switch (_context2.prev = _context2.next) {
               case 0:
                 request = _ref2.request, isAuthenticated = _ref2.isAuthenticated, prisma = _ref2.prisma;
-
-                /**
-                 * 인증 확인
-                 */
-                isAuthenticated({
+                _context2.next = 3;
+                return isAuthenticated({
                   request: request
                 });
+
+              case 3:
                 id = request.user.id;
                 postId = args.postId, content = args.content;
                 /**
@@ -126,16 +125,16 @@ module.exports = {
                  * @type {Post|null}
                  */
 
-                _context2.next = 6;
+                _context2.next = 7;
                 return prisma.post({
                   id: postId
                 });
 
-              case 6:
+              case 7:
                 findPost = _context2.sent;
 
                 if (findPost) {
-                  _context2.next = 9;
+                  _context2.next = 10;
                   break;
                 }
 
@@ -144,8 +143,8 @@ module.exports = {
                   status: 403
                 }));
 
-              case 9:
-                _context2.next = 11;
+              case 10:
+                _context2.next = 12;
                 return prisma.createComment({
                   content: content,
                   post: {
@@ -160,8 +159,8 @@ module.exports = {
                   }
                 });
 
-              case 11:
-                _context2.next = 13;
+              case 12:
+                _context2.next = 14;
                 return prisma.updatePost({
                   where: {
                     id: postId
@@ -171,10 +170,10 @@ module.exports = {
                   }
                 });
 
-              case 13:
+              case 14:
                 return _context2.abrupt("return", true);
 
-              case 14:
+              case 15:
               case "end":
                 return _context2.stop();
             }
@@ -206,29 +205,28 @@ module.exports = {
             switch (_context3.prev = _context3.next) {
               case 0:
                 request = _ref3.request, isAuthenticated = _ref3.isAuthenticated, prisma = _ref3.prisma;
-
-                /**
-                 * 인증 확인
-                 */
-                isAuthenticated({
+                _context3.next = 3;
+                return isAuthenticated({
                   request: request
                 });
+
+              case 3:
                 id = args.id, content = args.content;
                 /**
                  * 댓글 유무 확인
                  * @type {boolean}
                  */
 
-                _context3.next = 5;
+                _context3.next = 6;
                 return prisma.$exists.comment({
                   id: id
                 });
 
-              case 5:
+              case 6:
                 isExistComment = _context3.sent;
 
                 if (isExistComment) {
-                  _context3.next = 8;
+                  _context3.next = 9;
                   break;
                 }
 
@@ -237,8 +235,8 @@ module.exports = {
                   status: 403
                 }));
 
-              case 8:
-                _context3.next = 10;
+              case 9:
+                _context3.next = 11;
                 return prisma.updateComment({
                   where: {
                     id: id
@@ -248,10 +246,10 @@ module.exports = {
                   }
                 });
 
-              case 10:
+              case 11:
                 return _context3.abrupt("return", true);
 
-              case 11:
+              case 12:
               case "end":
                 return _context3.stop();
             }
@@ -282,29 +280,28 @@ module.exports = {
             switch (_context4.prev = _context4.next) {
               case 0:
                 request = _ref4.request, isAuthenticated = _ref4.isAuthenticated, prisma = _ref4.prisma;
-
-                /**
-                 * 인증 확인
-                 */
-                isAuthenticated({
+                _context4.next = 3;
+                return isAuthenticated({
                   request: request
                 });
+
+              case 3:
                 id = args.id;
                 /**
                  * 댓글 유무 확인
                  * @type {Comment|null}
                  */
 
-                _context4.next = 5;
+                _context4.next = 6;
                 return prisma.comment({
                   id: id
                 }).$fragment(COMMENT_FRAGMENT);
 
-              case 5:
+              case 6:
                 findComment = _context4.sent;
 
                 if (findComment) {
-                  _context4.next = 8;
+                  _context4.next = 9;
                   break;
                 }
 
@@ -313,14 +310,14 @@ module.exports = {
                   status: 403
                 }));
 
-              case 8:
-                _context4.next = 10;
+              case 9:
+                _context4.next = 11;
                 return prisma.deleteComment({
                   id: id
                 });
 
-              case 10:
-                _context4.next = 12;
+              case 11:
+                _context4.next = 13;
                 return prisma.updatePost({
                   where: {
                     id: findComment.post.id
@@ -330,10 +327,10 @@ module.exports = {
                   }
                 });
 
-              case 12:
+              case 13:
                 return _context4.abrupt("return", true);
 
-              case 13:
+              case 14:
               case "end":
                 return _context4.stop();
             }

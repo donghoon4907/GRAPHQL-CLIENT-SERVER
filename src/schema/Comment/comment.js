@@ -77,7 +77,7 @@ module.exports = {
       /**
        * 인증 확인
        */
-      isAuthenticated({ request });
+      await isAuthenticated({ request });
 
       const {
         user: { id }
@@ -144,7 +144,7 @@ module.exports = {
       /**
        * 인증 확인
        */
-      isAuthenticated({ request });
+      await isAuthenticated({ request });
 
       const { id, content } = args;
 
@@ -187,7 +187,7 @@ module.exports = {
       /**
        * 인증 확인
        */
-      isAuthenticated({ request });
+      await isAuthenticated({ request });
 
       const { id } = args;
 

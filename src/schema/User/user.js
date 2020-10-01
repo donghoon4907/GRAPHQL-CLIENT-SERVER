@@ -50,11 +50,11 @@ module.exports = {
      * @author frisk
      * @returns User!
      */
-    me: (_, __, { request, isAuthenticated, prisma }) => {
+    me: async (_, __, { request, isAuthenticated, prisma }) => {
       /**
        * 인증 확인
        */
-      isAuthenticated({ request });
+      await isAuthenticated({ request });
 
       const {
         user: { id }
@@ -135,7 +135,7 @@ module.exports = {
       /**
        * 인증 확인
        */
-      isAuthenticated({ request });
+      await isAuthenticated({ request });
 
       const {
         user: { id }

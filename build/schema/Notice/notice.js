@@ -86,24 +86,23 @@ module.exports = {
             switch (_context2.prev = _context2.next) {
               case 0:
                 request = _ref3.request, isAuthenticated = _ref3.isAuthenticated, prisma = _ref3.prisma;
-
-                /**
-                 * 인증 확인
-                 */
-                isAuthenticated({
+                _context2.next = 3;
+                return isAuthenticated({
                   request: request
                 });
+
+              case 3:
                 title = args.title, description = args.description;
-                _context2.next = 5;
+                _context2.next = 6;
                 return prisma.createNotice({
                   title: title,
                   description: description
                 });
 
-              case 5:
+              case 6:
                 return _context2.abrupt("return", true);
 
-              case 6:
+              case 7:
               case "end":
                 return _context2.stop();
             }
@@ -136,29 +135,28 @@ module.exports = {
             switch (_context3.prev = _context3.next) {
               case 0:
                 request = _ref4.request, isAuthenticated = _ref4.isAuthenticated, prisma = _ref4.prisma;
-
-                /**
-                 * 인증 확인
-                 */
-                isAuthenticated({
+                _context3.next = 3;
+                return isAuthenticated({
                   request: request
                 });
+
+              case 3:
                 id = args.id, title = args.title, description = args.description;
                 /**
                  * 공지사항 유무 확인
                  * @type {boolean}
                  */
 
-                _context3.next = 5;
+                _context3.next = 6;
                 return prisma.$exists.notice({
                   id: id
                 });
 
-              case 5:
+              case 6:
                 isExistNotice = _context3.sent;
 
                 if (isExistNotice) {
-                  _context3.next = 8;
+                  _context3.next = 9;
                   break;
                 }
 
@@ -167,8 +165,8 @@ module.exports = {
                   status: 403
                 }));
 
-              case 8:
-                _context3.next = 10;
+              case 9:
+                _context3.next = 11;
                 return prisma.updateNotice({
                   where: {
                     id: id
@@ -179,10 +177,10 @@ module.exports = {
                   }
                 });
 
-              case 10:
+              case 11:
                 return _context3.abrupt("return", true);
 
-              case 11:
+              case 12:
               case "end":
                 return _context3.stop();
             }
@@ -213,29 +211,28 @@ module.exports = {
             switch (_context4.prev = _context4.next) {
               case 0:
                 request = _ref5.request, isAuthenticated = _ref5.isAuthenticated, prisma = _ref5.prisma;
-
-                /**
-                 * 인증 확인
-                 */
-                isAuthenticated({
+                _context4.next = 3;
+                return isAuthenticated({
                   request: request
                 });
+
+              case 3:
                 id = args.id;
                 /**
                  * 공지사항 유무 확인
                  * @type {boolean}
                  */
 
-                _context4.next = 5;
+                _context4.next = 6;
                 return prisma.$exists.notice({
                   id: id
                 });
 
-              case 5:
+              case 6:
                 isExistNotice = _context4.sent;
 
                 if (isExistNotice) {
-                  _context4.next = 8;
+                  _context4.next = 9;
                   break;
                 }
 
@@ -244,16 +241,16 @@ module.exports = {
                   status: 403
                 }));
 
-              case 8:
-                _context4.next = 10;
+              case 9:
+                _context4.next = 11;
                 return prisma.deleteNotice({
                   id: id
                 });
 
-              case 10:
+              case 11:
                 return _context4.abrupt("return", true);
 
-              case 11:
+              case 12:
               case "end":
                 return _context4.stop();
             }

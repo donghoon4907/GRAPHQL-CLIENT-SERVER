@@ -273,20 +273,19 @@ module.exports = {
             switch (_context3.prev = _context3.next) {
               case 0:
                 request = _ref3.request, isAuthenticated = _ref3.isAuthenticated, prisma = _ref3.prisma;
-
-                /**
-                 * 인증 확인
-                 */
-                isAuthenticated({
+                _context3.next = 3;
+                return isAuthenticated({
                   request: request
                 });
+
+              case 3:
                 _request$user = request.user, id = _request$user.id, postCount = _request$user.postCount;
                 title = args.title, description = args.description, content = args.content, category = args.category;
                 /**
                  * 게시물 추가
                  */
 
-                _context3.next = 6;
+                _context3.next = 7;
                 return prisma.createPost({
                   title: title,
                   description: description,
@@ -299,21 +298,21 @@ module.exports = {
                   }
                 });
 
-              case 6:
-                _context3.next = 8;
+              case 7:
+                _context3.next = 9;
                 return prisma.category({
                   content: category
                 });
 
-              case 8:
+              case 9:
                 findCategory = _context3.sent;
 
                 if (!findCategory) {
-                  _context3.next = 14;
+                  _context3.next = 15;
                   break;
                 }
 
-                _context3.next = 12;
+                _context3.next = 13;
                 return prisma.updateCategory({
                   data: {
                     useCount: findCategory.useCount + 1
@@ -323,19 +322,19 @@ module.exports = {
                   }
                 });
 
-              case 12:
-                _context3.next = 16;
+              case 13:
+                _context3.next = 17;
                 break;
 
-              case 14:
-                _context3.next = 16;
+              case 15:
+                _context3.next = 17;
                 return prisma.createCategory({
                   content: category,
                   useCount: 1
                 });
 
-              case 16:
-                _context3.next = 18;
+              case 17:
+                _context3.next = 19;
                 return prisma.updateUser({
                   where: {
                     id: id
@@ -345,10 +344,10 @@ module.exports = {
                   }
                 });
 
-              case 18:
+              case 19:
                 return _context3.abrupt("return", true);
 
-              case 19:
+              case 20:
               case "end":
                 return _context3.stop();
             }
@@ -381,29 +380,28 @@ module.exports = {
             switch (_context4.prev = _context4.next) {
               case 0:
                 request = _ref4.request, isAuthenticated = _ref4.isAuthenticated, prisma = _ref4.prisma;
-
-                /**
-                 * 인증 확인
-                 */
-                isAuthenticated({
+                _context4.next = 3;
+                return isAuthenticated({
                   request: request
                 });
+
+              case 3:
                 id = args.id, title = args.title, description = args.description, content = args.content, category = args.category;
                 /**
                  * 게시물 유무 확인
                  * @type {boolean}
                  */
 
-                _context4.next = 5;
+                _context4.next = 6;
                 return prisma.post({
                   id: id
                 });
 
-              case 5:
+              case 6:
                 findPost = _context4.sent;
 
                 if (findPost) {
-                  _context4.next = 8;
+                  _context4.next = 9;
                   break;
                 }
 
@@ -412,8 +410,8 @@ module.exports = {
                   status: 403
                 }));
 
-              case 8:
-                _context4.next = 10;
+              case 9:
+                _context4.next = 11;
                 return prisma.updatePost({
                   where: {
                     id: id
@@ -426,26 +424,26 @@ module.exports = {
                   }
                 });
 
-              case 10:
+              case 11:
                 if (!(findPost.category !== category)) {
-                  _context4.next = 21;
+                  _context4.next = 22;
                   break;
                 }
 
-                _context4.next = 13;
+                _context4.next = 14;
                 return prisma.category({
                   content: category
                 });
 
-              case 13:
+              case 14:
                 findCategory = _context4.sent;
 
                 if (!findCategory) {
-                  _context4.next = 19;
+                  _context4.next = 20;
                   break;
                 }
 
-                _context4.next = 17;
+                _context4.next = 18;
                 return prisma.updateCategory({
                   data: {
                     useCount: findCategory.useCount + 1
@@ -455,21 +453,21 @@ module.exports = {
                   }
                 });
 
-              case 17:
-                _context4.next = 21;
+              case 18:
+                _context4.next = 22;
                 break;
 
-              case 19:
-                _context4.next = 21;
+              case 20:
+                _context4.next = 22;
                 return prisma.createCategory({
                   content: category,
                   useCount: 1
                 });
 
-              case 21:
+              case 22:
                 return _context4.abrupt("return", true);
 
-              case 22:
+              case 23:
               case "end":
                 return _context4.stop();
             }
@@ -500,13 +498,12 @@ module.exports = {
             switch (_context5.prev = _context5.next) {
               case 0:
                 request = _ref5.request, isAuthenticated = _ref5.isAuthenticated, prisma = _ref5.prisma;
-
-                /**
-                 * 인증 확인
-                 */
-                isAuthenticated({
+                _context5.next = 3;
+                return isAuthenticated({
                   request: request
                 });
+
+              case 3:
                 user = request.user;
                 id = args.id;
                 /**
@@ -514,16 +511,16 @@ module.exports = {
                  * @type {boolean}
                  */
 
-                _context5.next = 6;
+                _context5.next = 7;
                 return prisma.$exists.post({
                   id: id
                 });
 
-              case 6:
+              case 7:
                 isExistPost = _context5.sent;
 
                 if (isExistPost) {
-                  _context5.next = 9;
+                  _context5.next = 10;
                   break;
                 }
 
@@ -532,14 +529,14 @@ module.exports = {
                   status: 403
                 }));
 
-              case 9:
-                _context5.next = 11;
+              case 10:
+                _context5.next = 12;
                 return prisma.deletePost({
                   id: id
                 });
 
-              case 11:
-                _context5.next = 13;
+              case 12:
+                _context5.next = 14;
                 return prisma.updateUser({
                   where: {
                     id: user.id
@@ -549,10 +546,10 @@ module.exports = {
                   }
                 });
 
-              case 13:
+              case 14:
                 return _context5.abrupt("return", true);
 
-              case 14:
+              case 15:
               case "end":
                 return _context5.stop();
             }
@@ -583,13 +580,12 @@ module.exports = {
             switch (_context6.prev = _context6.next) {
               case 0:
                 request = _ref6.request, isAuthenticated = _ref6.isAuthenticated, prisma = _ref6.prisma;
-
-                /**
-                 * 인증 확인
-                 */
-                isAuthenticated({
+                _context6.next = 3;
+                return isAuthenticated({
                   request: request
                 });
+
+              case 3:
                 user = request.user;
                 id = args.id;
                 /**
@@ -613,16 +609,16 @@ module.exports = {
                  * @type {boolean}
                  */
 
-                _context6.next = 7;
+                _context6.next = 8;
                 return prisma.post({
                   id: id
                 });
 
-              case 7:
+              case 8:
                 findPost = _context6.sent;
 
                 if (findPost) {
-                  _context6.next = 10;
+                  _context6.next = 11;
                   break;
                 }
 
@@ -631,23 +627,23 @@ module.exports = {
                   status: 403
                 }));
 
-              case 10:
-                _context6.next = 12;
+              case 11:
+                _context6.next = 13;
                 return prisma.$exists.like(options);
 
-              case 12:
+              case 13:
                 isExistLike = _context6.sent;
 
                 if (!isExistLike) {
-                  _context6.next = 20;
+                  _context6.next = 21;
                   break;
                 }
 
-                _context6.next = 16;
+                _context6.next = 17;
                 return prisma.deleteManyLikes(options);
 
-              case 16:
-                _context6.next = 18;
+              case 17:
+                _context6.next = 19;
                 return prisma.updatePost({
                   where: {
                     id: id
@@ -657,12 +653,12 @@ module.exports = {
                   }
                 });
 
-              case 18:
-                _context6.next = 24;
+              case 19:
+                _context6.next = 25;
                 break;
 
-              case 20:
-                _context6.next = 22;
+              case 21:
+                _context6.next = 23;
                 return prisma.createLike({
                   user: {
                     connect: {
@@ -676,8 +672,8 @@ module.exports = {
                   }
                 });
 
-              case 22:
-                _context6.next = 24;
+              case 23:
+                _context6.next = 25;
                 return prisma.updatePost({
                   where: {
                     id: id
@@ -687,10 +683,10 @@ module.exports = {
                   }
                 });
 
-              case 24:
+              case 25:
                 return _context6.abrupt("return", true);
 
-              case 25:
+              case 26:
               case "end":
                 return _context6.stop();
             }

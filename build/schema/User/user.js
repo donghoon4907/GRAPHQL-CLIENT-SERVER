@@ -81,22 +81,39 @@ module.exports = {
      * @author frisk
      * @returns User!
      */
-    me: function me(_, __, _ref3) {
-      var request = _ref3.request,
-          isAuthenticated = _ref3.isAuthenticated,
-          prisma = _ref3.prisma;
+    me: function () {
+      var _me = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(_, __, _ref3) {
+        var request, isAuthenticated, prisma, id;
+        return _regenerator["default"].wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                request = _ref3.request, isAuthenticated = _ref3.isAuthenticated, prisma = _ref3.prisma;
+                _context2.next = 3;
+                return isAuthenticated({
+                  request: request
+                });
 
-      /**
-       * 인증 확인
-       */
-      isAuthenticated({
-        request: request
-      });
-      var id = request.user.id;
-      return prisma.user({
-        id: id
-      }).$fragment(MY_FRAGMENT);
-    }
+              case 3:
+                id = request.user.id;
+                return _context2.abrupt("return", prisma.user({
+                  id: id
+                }).$fragment(MY_FRAGMENT));
+
+              case 5:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2);
+      }));
+
+      function me(_x4, _x5, _x6) {
+        return _me.apply(this, arguments);
+      }
+
+      return me;
+    }()
   },
   Mutation: {
     /**
@@ -110,11 +127,11 @@ module.exports = {
      * @returns boolean
      */
     createUser: function () {
-      var _createUser = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(_, args, _ref4) {
+      var _createUser = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(_, args, _ref4) {
         var prisma, email, nickname, file, isExistEmail, isExistNickname;
-        return _regenerator["default"].wrap(function _callee2$(_context2) {
+        return _regenerator["default"].wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
                 prisma = _ref4.prisma;
                 email = args.email, nickname = args.nickname, file = args.file;
@@ -123,16 +140,16 @@ module.exports = {
                  * @type {boolean}
                  */
 
-                _context2.next = 4;
+                _context3.next = 4;
                 return prisma.$exists.user({
                   email: email
                 });
 
               case 4:
-                isExistEmail = _context2.sent;
+                isExistEmail = _context3.sent;
 
                 if (!isExistEmail) {
-                  _context2.next = 7;
+                  _context3.next = 7;
                   break;
                 }
 
@@ -142,98 +159,8 @@ module.exports = {
                 }));
 
               case 7:
-                _context2.next = 9;
-                return prisma.$exists.user({
-                  nickname: nickname
-                });
-
-              case 9:
-                isExistNickname = _context2.sent;
-
-                if (!isExistNickname) {
-                  _context2.next = 12;
-                  break;
-                }
-
-                throw Error(JSON.stringify({
-                  message: "이미 존재하는 닉네임입니다.",
-                  status: 403
-                }));
-
-              case 12:
-                _context2.next = 14;
-                return prisma.createUser({
-                  email: email,
-                  nickname: nickname,
-                  avatar: {
-                    create: {
-                      url: file
-                    }
-                  }
-                });
-
-              case 14:
-                return _context2.abrupt("return", true);
-
-              case 15:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2);
-      }));
-
-      function createUser(_x4, _x5, _x6) {
-        return _createUser.apply(this, arguments);
-      }
-
-      return createUser;
-    }(),
-
-    /**
-     * * 내 정보 수정
-     *
-     * @mutation
-     * @author frisk
-     * @param {string?} args.nickname 별칭
-     * @param {string?} args.file 업로드한 프로필 사진
-     * @returns boolean
-     */
-    updateUser: function () {
-      var _updateUser = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(_, args, _ref5) {
-        var request, isAuthenticated, prisma, id, nickname, file, data, isExistNickname;
-        return _regenerator["default"].wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                request = _ref5.request, isAuthenticated = _ref5.isAuthenticated, prisma = _ref5.prisma;
-
-                /**
-                 * 인증 확인
-                 */
-                isAuthenticated({
-                  request: request
-                });
-                id = request.user.id;
-                nickname = args.nickname, file = args.file;
-                /**
-                 * 수정할 데이터
-                 */
-
-                data = {};
-
-                if (!nickname) {
-                  _context3.next = 13;
-                  break;
-                }
-
-                if (!(nickname !== findMe.nickname)) {
-                  _context3.next = 13;
-                  break;
-                }
-
                 _context3.next = 9;
-                return prisma.$exist.user({
+                return prisma.$exists.user({
                   nickname: nickname
                 });
 
@@ -251,9 +178,98 @@ module.exports = {
                 }));
 
               case 12:
-                data["nickname"] = nickname;
+                _context3.next = 14;
+                return prisma.createUser({
+                  email: email,
+                  nickname: nickname,
+                  avatar: {
+                    create: {
+                      url: file
+                    }
+                  }
+                });
+
+              case 14:
+                return _context3.abrupt("return", true);
+
+              case 15:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
+      }));
+
+      function createUser(_x7, _x8, _x9) {
+        return _createUser.apply(this, arguments);
+      }
+
+      return createUser;
+    }(),
+
+    /**
+     * * 내 정보 수정
+     *
+     * @mutation
+     * @author frisk
+     * @param {string?} args.nickname 별칭
+     * @param {string?} args.file 업로드한 프로필 사진
+     * @returns boolean
+     */
+    updateUser: function () {
+      var _updateUser = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(_, args, _ref5) {
+        var request, isAuthenticated, prisma, id, nickname, file, data, isExistNickname;
+        return _regenerator["default"].wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                request = _ref5.request, isAuthenticated = _ref5.isAuthenticated, prisma = _ref5.prisma;
+                _context4.next = 3;
+                return isAuthenticated({
+                  request: request
+                });
+
+              case 3:
+                id = request.user.id;
+                nickname = args.nickname, file = args.file;
+                /**
+                 * 수정할 데이터
+                 */
+
+                data = {};
+
+                if (!nickname) {
+                  _context4.next = 14;
+                  break;
+                }
+
+                if (!(nickname !== findMe.nickname)) {
+                  _context4.next = 14;
+                  break;
+                }
+
+                _context4.next = 10;
+                return prisma.$exist.user({
+                  nickname: nickname
+                });
+
+              case 10:
+                isExistNickname = _context4.sent;
+
+                if (!isExistNickname) {
+                  _context4.next = 13;
+                  break;
+                }
+
+                throw Error(JSON.stringify({
+                  message: "이미 존재하는 닉네임입니다.",
+                  status: 403
+                }));
 
               case 13:
+                data["nickname"] = nickname;
+
+              case 14:
                 if (file) {
                   /**
                    * 수정을 원하는 프로필 사진이 현재 설정된 프로필 사진과 다른 경우
@@ -271,7 +287,7 @@ module.exports = {
                  */
 
 
-                _context3.next = 16;
+                _context4.next = 17;
                 return prisma.updateUser({
                   where: {
                     id: id
@@ -279,18 +295,18 @@ module.exports = {
                   data: data
                 });
 
-              case 16:
-                return _context3.abrupt("return", true);
-
               case 17:
+                return _context4.abrupt("return", true);
+
+              case 18:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3);
+        }, _callee4);
       }));
 
-      function updateUser(_x7, _x8, _x9) {
+      function updateUser(_x10, _x11, _x12) {
         return _updateUser.apply(this, arguments);
       }
 
@@ -306,11 +322,11 @@ module.exports = {
      * @returns User
      */
     logIn: function () {
-      var _logIn = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(_, args, _ref6) {
+      var _logIn = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(_, args, _ref6) {
         var prisma, email, user, id, nickname, avatar, isMaster, token;
-        return _regenerator["default"].wrap(function _callee4$(_context4) {
+        return _regenerator["default"].wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 prisma = _ref6.prisma;
                 email = args.email;
@@ -318,16 +334,16 @@ module.exports = {
                  * 이메일로 사용자 조회
                  */
 
-                _context4.next = 4;
+                _context5.next = 4;
                 return prisma.user({
                   email: email
                 }).$fragment(MY_FRAGMENT);
 
               case 4:
-                user = _context4.sent;
+                user = _context5.sent;
 
                 if (user) {
-                  _context4.next = 7;
+                  _context5.next = 7;
                   break;
                 }
 
@@ -345,7 +361,7 @@ module.exports = {
                 token = generateToken({
                   id: id
                 });
-                return _context4.abrupt("return", {
+                return _context5.abrupt("return", {
                   token: token,
                   id: id,
                   nickname: nickname,
@@ -356,13 +372,13 @@ module.exports = {
 
               case 10:
               case "end":
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4);
+        }, _callee5);
       }));
 
-      function logIn(_x10, _x11, _x12) {
+      function logIn(_x13, _x14, _x15) {
         return _logIn.apply(this, arguments);
       }
 
