@@ -8,10 +8,13 @@ module.exports = {
      *
      * @query
      * @author frisk
-     * @param {number?} args.skip 건너뛸 목록의 수
-     * @param {number?} args.first 요청 목록의 수
-     * @param {string?} args.orderBy 정렬
-     * @param {string?} args.query 검색어
+     * @param {number|undefined} args.skip      건너뛸 목록의 수
+     * @param {number|undefined} args.first     요청 목록의 수
+     * @param {string|undefined} args.orderBy   정렬
+     * @param {string|undefined} args.query     검색어
+     * @param {string|undefined} args.category  카테고리
+     * @param {string|undefined} args.userId    사용자 ID
+     * @param {boolean} args.notNullThumb       썸네일이 있는 것만 요청할 지 여부
      * @returns Post[]
      */
     posts: async (_, args, { prisma }) => {
@@ -21,7 +24,8 @@ module.exports = {
         orderBy = "createdAt_DESC",
         query,
         category,
-        userId
+        userId,
+        notNullThumb
       } = args;
 
       /**
@@ -50,6 +54,12 @@ module.exports = {
        */
       if (userId) {
         orFilter.push({ user: { id: userId } });
+      }
+      /**
+       * 썸네일이 있는 것만 조건 추가 시
+       */
+      if (notNullThumb) {
+        orFilter.push({ thumbnail_not: null });
       }
 
       const where =

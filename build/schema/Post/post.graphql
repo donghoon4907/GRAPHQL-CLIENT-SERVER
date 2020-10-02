@@ -12,6 +12,7 @@ type Query {
     query: String
     category: String
     userId: String
+    notNullThumb: Boolean
   ): PostList!
 
   post(id: String!): Post!

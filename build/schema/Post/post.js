@@ -19,22 +19,25 @@ module.exports = {
      *
      * @query
      * @author frisk
-     * @param {number?} args.skip 건너뛸 목록의 수
-     * @param {number?} args.first 요청 목록의 수
-     * @param {string?} args.orderBy 정렬
-     * @param {string?} args.query 검색어
+     * @param {number|undefined} args.skip      건너뛸 목록의 수
+     * @param {number|undefined} args.first     요청 목록의 수
+     * @param {string|undefined} args.orderBy   정렬
+     * @param {string|undefined} args.query     검색어
+     * @param {string|undefined} args.category  카테고리
+     * @param {string|undefined} args.userId    사용자 ID
+     * @param {boolean} args.notNullThumb       썸네일이 있는 것만 요청할 지 여부
      * @returns Post[]
      */
     posts: function () {
       var _posts = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(_, args, _ref) {
-        var prisma, _args$skip, skip, _args$first, first, _args$orderBy, orderBy, query, category, userId, orFilter, where, posts, total;
+        var prisma, _args$skip, skip, _args$first, first, _args$orderBy, orderBy, query, category, userId, notNullThumb, orFilter, where, posts, total;
 
         return _regenerator["default"].wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 prisma = _ref.prisma;
-                _args$skip = args.skip, skip = _args$skip === void 0 ? 0 : _args$skip, _args$first = args.first, first = _args$first === void 0 ? 30 : _args$first, _args$orderBy = args.orderBy, orderBy = _args$orderBy === void 0 ? "createdAt_DESC" : _args$orderBy, query = args.query, category = args.category, userId = args.userId;
+                _args$skip = args.skip, skip = _args$skip === void 0 ? 0 : _args$skip, _args$first = args.first, first = _args$first === void 0 ? 30 : _args$first, _args$orderBy = args.orderBy, orderBy = _args$orderBy === void 0 ? "createdAt_DESC" : _args$orderBy, query = args.query, category = args.category, userId = args.userId, notNullThumb = args.notNullThumb;
                 /**
                  * 필터 목록
                  * @type {Array<object>}
@@ -78,6 +81,16 @@ module.exports = {
                     }
                   });
                 }
+                /**
+                 * 썸네일이 있는 것만 조건 추가 시
+                 */
+
+
+                if (notNullThumb) {
+                  orFilter.push({
+                    thumbnail_not: null
+                  });
+                }
 
                 where = orFilter.length > 0 ? {
                   OR: orFilter
@@ -86,7 +99,7 @@ module.exports = {
                  * 목록
                  */
 
-                _context.next = 9;
+                _context.next = 10;
                 return prisma.posts({
                   first: first,
                   skip: skip,
@@ -94,21 +107,21 @@ module.exports = {
                   orderBy: orderBy
                 }).$fragment(POSTS_FRAGMENT);
 
-              case 9:
+              case 10:
                 posts = _context.sent;
-                _context.next = 12;
+                _context.next = 13;
                 return prisma.postsConnection({
                   where: where
                 }).aggregate().count();
 
-              case 12:
+              case 13:
                 total = _context.sent;
                 return _context.abrupt("return", {
                   data: posts,
                   total: total
                 });
 
-              case 14:
+              case 15:
               case "end":
                 return _context.stop();
             }
