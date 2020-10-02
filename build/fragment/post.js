@@ -1,4 +1,4 @@
 "use strict";
 
-exports.POSTS_FRAGMENT = "\n  fragment PostsParts on Post {\n    id\n    title \n    description\n    user {\n      id\n      nickname\n      avatar {\n        url\n      }\n    }\n    likeCount\n    likes {\n      id\n      user {\n        id\n      }\n    }\n    createdAt\n    updatedAt \n    viewCount\n    category\n    commentCount\n  }\n";
+exports.POSTS_FRAGMENT = "\n  fragment PostsParts on Post {\n    id\n    title \n    description\n    user {\n      id\n      nickname\n      avatar {\n        url\n      }\n    }\n    likeCount\n    likes {\n      id\n      user {\n        id\n      }\n    }\n    createdAt\n    updatedAt \n    viewCount\n    category\n    commentCount\n    thumbnail\n  }\n";
 exports.POST_FRAGMENT = "\n  fragment PostParts on Post {\n    id\n    title \n    description\n    content\n    user {\n      id\n      nickname\n      avatar {\n        url\n      }\n    }\n    likeCount\n    likes {\n      id\n      user {\n        id\n      }\n    }\n    createdAt\n    updatedAt \n    viewCount\n    category\n  }\n";

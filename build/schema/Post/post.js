@@ -266,7 +266,7 @@ module.exports = {
      */
     createPost: function () {
       var _createPost = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(_, args, _ref3) {
-        var request, isAuthenticated, prisma, _request$user, id, postCount, title, description, content, category, findCategory;
+        var request, isAuthenticated, prisma, _request$user, id, postCount, title, description, content, category, thumbnail, findCategory;
 
         return _regenerator["default"].wrap(function _callee3$(_context3) {
           while (1) {
@@ -280,7 +280,7 @@ module.exports = {
 
               case 3:
                 _request$user = request.user, id = _request$user.id, postCount = _request$user.postCount;
-                title = args.title, description = args.description, content = args.content, category = args.category;
+                title = args.title, description = args.description, content = args.content, category = args.category, thumbnail = args.thumbnail;
                 /**
                  * 게시물 추가
                  */
@@ -295,7 +295,8 @@ module.exports = {
                     connect: {
                       id: id
                     }
-                  }
+                  },
+                  thumbnail: thumbnail
                 });
 
               case 7:
@@ -374,7 +375,7 @@ module.exports = {
      */
     updatePost: function () {
       var _updatePost = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(_, args, _ref4) {
-        var request, isAuthenticated, prisma, id, title, description, content, category, findPost, findCategory;
+        var request, isAuthenticated, prisma, id, title, description, content, category, thumbnail, findPost, findCategory;
         return _regenerator["default"].wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
@@ -386,7 +387,7 @@ module.exports = {
                 });
 
               case 3:
-                id = args.id, title = args.title, description = args.description, content = args.content, category = args.category;
+                id = args.id, title = args.title, description = args.description, content = args.content, category = args.category, thumbnail = args.thumbnail;
                 /**
                  * 게시물 유무 확인
                  * @type {boolean}
@@ -420,7 +421,8 @@ module.exports = {
                     title: title,
                     description: description,
                     content: content,
-                    category: category
+                    category: category,
+                    thumbnail: thumbnail
                   }
                 });
 

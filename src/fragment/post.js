@@ -22,6 +22,7 @@ exports.POSTS_FRAGMENT = `
     viewCount
     category
     commentCount
+    thumbnail
   }
 `;
 

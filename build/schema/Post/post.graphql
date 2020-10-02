@@ -23,6 +23,7 @@ type Mutation {
     description: String!
     content: String!
     category: String!
+    thumbnail: String
   ): Boolean!
 
   updatePost(
@@ -31,6 +32,7 @@ type Mutation {
     description: String!
     content: String!
     category: String!
+    thumbnail: String
   ): Boolean!
 
   deletePost(id: String!): Boolean!

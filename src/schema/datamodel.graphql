@@ -28,6 +28,7 @@ type Post {
   category: String! # 카테고리
   comments: [Comment!]! # 댓글 목록
   commentCount: Int! # 댓글수
+  thumbnail: String # 썸네일
 }
 # 공지사항
 type Notice {

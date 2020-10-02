@@ -191,7 +191,7 @@ module.exports = {
         user: { id, postCount }
       } = request;
 
-      const { title, description, content, category } = args;
+      const { title, description, content, category, thumbnail } = args;
 
       /**
        * 게시물 추가
@@ -203,7 +203,8 @@ module.exports = {
         category,
         user: {
           connect: { id }
-        }
+        },
+        thumbnail
       });
 
       /**
@@ -262,7 +263,7 @@ module.exports = {
        */
       await isAuthenticated({ request });
 
-      const { id, title, description, content, category } = args;
+      const { id, title, description, content, category, thumbnail } = args;
 
       /**
        * 게시물 유무 확인
@@ -285,7 +286,8 @@ module.exports = {
           title,
           description,
           content,
-          category
+          category,
+          thumbnail
         }
       });
       /**

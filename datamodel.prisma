@@ -27,6 +27,7 @@ type Post {
   category: String!
   comments: [Comment!]! @relation(name: "CommentOfPost", onDelete: CASCADE)
   commentCount: Int! @default(value: 0)
+  thumbnail: String
 }
 
 type Notice {
